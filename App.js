@@ -10,7 +10,6 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, FlatList, NativeModules, DeviceEventEmitter, AsyncStorage} from 'react-native';
 // import {Container, Header, Left, Right, Body, Button, Title, Icon, Content} from 'native-base';
 
-type Props = {};
 class App extends Component {
   constructor(props) {
     super(props);
@@ -63,7 +62,7 @@ class App extends Component {
     return (
       <View style={styles.container}>
       
-          <View style={styles.headerView}><Text style={styles.headerText}>Notification Rrescue</Text></View>
+          <View style={styles.headerView}><Text style={styles.headerText}>Notification Rescue</Text></View>
           {/* <Text style={styles.instructions}>headset Level</Text> */}
           <FlatList
             style={styles.bodyView}
