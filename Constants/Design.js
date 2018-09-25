@@ -1,11 +1,23 @@
-export const PRIMARY_COLOR = '#536dfe';
-export const PRIMARY_COLOR_DARK = '#0043ca';
-export const PRIMARY_COLOR_LIGHT = '#8f9bff';
 
-export const SECONDARY_COLOR = '#ffeb3b';
-export const SECONDARY_COLOR_DARK = '#c8b900';
-export const SECONDARY_COLOR_LIGHT = '#ffff72';
+export const COLOR = {
+    PRIMARY:'#00b0ff',
+    PRIMARY_DARK:'#81d4fa',
+    PRIMARY_LIGHT:'#b3e5fc',
 
-export const PRIMARY_TEXT_COLOR = '#fafafa';
-export const SECONDARY_TEXT_COLOR = '#000000';
+    SECONDARY:'#ffeb3b',
+    SECONDARY_DARK:'#c8b900',
+    SECONDARY_LIGHT:'#ffff72',
+
+    PRIMARY_TEXT:'#fafafa',
+    SECONDARY_TEXT:'#000000',
+
+    ALL:'#7e57c2',
+    ALL_DARK:'#4d2c91',
+    APP:'#2e7d32',
+    APP_DARK:'#005005',
+    WHATSAPP:'#00796b',
+    WHATSAPP_DARK:'#004c40',
+    OTHER:'#827717',
+    OTHER_DARK:'#524c00',
+}
 

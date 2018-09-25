@@ -8,7 +8,8 @@ const Navigation = createStackNavigator({
 }, {
   initialRouteName: 'Home',
   mode: 'modal',
-  headerMode: 'none'
+  headerMode: 'none',
+  androidStatusBarColor: "#34495e"
  });
 
 export default Navigation;
