@@ -4,9 +4,9 @@ export const COLOR = {
     PRIMARY_DARK:'#81d4fa',
     PRIMARY_LIGHT:'#b3e5fc',
 
-    SECONDARY:'#ffeb3b',
-    SECONDARY_DARK:'#c8b900',
-    SECONDARY_LIGHT:'#ffff72',
+    SECONDARY:'#ffe082',
+    SECONDARY_DARK:'#caae53',
+    SECONDARY_LIGHT:'#ffffb3',
 
     PRIMARY_TEXT:'#fafafa',
     SECONDARY_TEXT:'#000000',

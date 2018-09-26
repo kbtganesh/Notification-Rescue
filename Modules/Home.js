@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, Image, View, ScrollView} from 'react-native';
+import {Platform, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity} from 'react-native';
+import { Icon } from 'native-base';
+
 import { COLOR } from '../Constants/Design';
 const BOX_TITLE = {'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Other'}
 const BOX_DESC = {
@@ -20,17 +22,33 @@ class Home extends Component {
 
    }
 
-   componentDidMount() {
-    
+   async componentDidMount() {
+    // try {
+    //   const dateObject = await DatePickerAndroid.open({
+    //     // Use `new Date()` for current date.
+    //     // May 25 2020. Month 0 is January.
+    //     date: new Date(2020, 4, 25)
+    //   });
+    //   if (dateObject.action !== DatePickerAndroid.dismissedAction) {
+    //     console.log('dateObject: ', dateObject);
+    //     // Selected year, month (0-11), day
+    //   }
+    // } catch ({code, message}) {
+    //   console.warn('Cannot open date picker', message);
+    // }
    }
 
   render() {
+    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>      
-          <View style={styles.headerView}><Text style={styles.headerText}>Notification Rescue</Text></View>
+          <View style={styles.headerView}>
+            <Icon type="FontAwesome" name="bell" style={{fontSize: 24, color: 'white'}}/>
+            <Text style={styles.headerText}>Notification Rescue</Text>
+          </View>
           <View style={styles.bodyView}>
           <ScrollView contentContainerStyle={{display: 'flex', justifyContent: 'space-around'}} style={{width: '100%', padding: 30}}>
-            <Box type='ALL'/>
+            <Box type='ALL' navigate={navigate}/>
             <Box type='APP'/>
             <Box type='WHATSAPP'/>
             <Box type='OTHER'/>
@@ -44,6 +62,7 @@ class Home extends Component {
 
 const Box = (props) => {
   let BottomColor = props.type+'_DARK';
+  const { navigate } = props;
   return(
     <View style={{...styles.box, marginBottom:props.type === 'OTHER'?50:30}}>
     <View style={{...styles.boxTop, backgroundColor: COLOR[props.type]}}>
@@ -51,7 +70,12 @@ const Box = (props) => {
       <Text style={styles.boxTopDesc}>{BOX_DESC[props.type]}</Text>
     </View>
     <View style={{...styles.boxBottom, backgroundColor: COLOR[BottomColor]}}>
-      <Text style={styles.boxBottomText}> OPEN </Text>
+      <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+        onPress={() =>
+          navigate('ALL', { name: 'All Notifications' })
+        }>
+          <Text style={styles.boxBottomText}>OPEN</Text>
+      </TouchableOpacity>
     </View>
     </View>
   )
@@ -80,7 +104,7 @@ const styles = StyleSheet.create({
   bodyView: {
     flex: 10,
     flexDirection: 'column',
-    backgroundColor: COLOR.PRIMARY_LIGHT,
+    backgroundColor: COLOR.SECONDARY,
     justifyContent: 'space-around',
     alignItems: 'center',
   },

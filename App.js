@@ -7,7 +7,9 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, FlatList, NativeModules, DeviceEventEmitter, AsyncStorage} from 'react-native';
+import {DatePickerAndroid, StyleSheet, Text, View, FlatList, TouchableOpacity, NativeModules, DeviceEventEmitter, AsyncStorage} from 'react-native';
+import { Icon } from 'native-base';
+import { COLOR } from './Constants/Design';
 // import {Container, Header, Left, Right, Body, Button, Title, Icon, Content} from 'native-base';
 
 class App extends Component {
@@ -15,12 +17,30 @@ class App extends Component {
     super(props);
    
     this.state = {
-      storedList: []
+      storedList: [],
+      selectedDate: '',
     };
 
     this.getBatteryLevel = this.getBatteryLevel.bind(this);
+    this.datePicker = this.datePicker.bind(this);
     this.callback = this.callback.bind(this);
 
+   }
+
+   async datePicker() {
+      try {
+        const dateObject = await DatePickerAndroid.open({
+          // Use `new Date()` for current date.
+          // May 25 2020. Month 0 is January.
+          date: new Date(2020, 4, 25)
+        });
+        if (dateObject.action !== DatePickerAndroid.dismissedAction) {
+          console.log('dateObject: ', dateObject);
+          // Selected year, month (0-11), day
+        }
+      } catch ({code, message}) {
+        console.warn('Cannot open date picker', message);
+      }
    }
 
    async componentDidMount() {
@@ -42,6 +62,7 @@ class App extends Component {
       var title = params['android.title'];
       var text = params['android.text'];
       var bigText = params['android.bigText'];
+      var summeryText = params['android.summaryText'];
       var timeStamp = params['timeStamp'];
       var timeText = new Date(parseInt(timeStamp)).toLocaleString();
       var notificationData = {appName, packageName, subText, title, text, bigText, timeStamp, timeText};
@@ -62,7 +83,21 @@ class App extends Component {
     return (
       <View style={styles.container}>
       
-          <View style={styles.headerView}><Text style={styles.headerText}>Notification Rescue</Text></View>
+          <View style={styles.headerView}>
+            <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+              onPress={() =>
+                this.props.navigation.goBack()
+              }>
+              <Text style={{color: 'white'}}>Back</Text>
+        </TouchableOpacity>
+            <Text style={styles.headerText}>All Notifications</Text>
+            <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+              onPress={() =>
+                this.datePicker()
+              }>
+              <Icon type="FontAwesome" name="calendar" style={{fontSize: 24, color: 'white'}}/>
+            </TouchableOpacity>
+          </View>
           {/* <Text style={styles.instructions}>headset Level</Text> */}
           <FlatList
             style={styles.bodyView}
@@ -92,26 +127,33 @@ const styles = StyleSheet.create({
   },
   headerView: {
     display: 'flex',
+    flexDirection: 'row',
     position: 'absolute',
-    textAlign: 'center',
-    justifyContent: 'center',
+    // textAlign: 'center',
+    justifyContent: 'space-between',
+    padding: 15,
     alignItems: 'center',
     height: 64,
     width: '100%',
-    borderBottomWidth: 1,
-    backgroundColor: '#fcae6a',
-    // borderBottomColor: 'black'
+    backgroundColor: COLOR.PRIMARY,
   },
   headerText: {
+    paddingLeft: 10,
     fontSize: 18,
+    color: 'white',
   },
   bodyView: {
-    backgroundColor: '#ffe6d1',
+    backgroundColor: '#ffffb3',
     marginTop: 64,
     height: 100,
   },
   listView: {
-    borderBottomWidth: 1,
+    margin: 10,
+    marginBottom: 0,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: 'black',
   }
 });
 
