@@ -1,4 +1,5 @@
 import Realm from 'realm';
+import moment from 'moment';
 
 let repository = new Realm({
   schema: [{
@@ -17,6 +18,13 @@ let repository = new Realm({
 });
 
 let NotificationService = {
+  getForDate: function(date) {
+    let today = date;
+    let nextDay = moment(today).add(1, 'days').toDate();
+    let dataList = repository.objects('Notification').filtered("createdAt >= $0 && createdAt < $1", today, nextDay);
+    console.log('DDDDDDDDDDDDDD dataList: ', dataList);
+    return dataList;
+  },
   getAll: function (sortBy) {
     // if (!sortBy) sortBy = [['completed', false], ['updatedAt', true]];
     // return repository.objects('Notification').sorted(sortBy);

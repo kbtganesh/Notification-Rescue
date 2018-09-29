@@ -6,8 +6,9 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {DatePickerAndroid, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage} from 'react-native';
+import React, { Component } from 'react';
+import { DatePickerAndroid, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
+import moment from 'moment';
 
 import { Icon } from 'native-base';
 import { COLOR } from '../../Constants/Design';
@@ -16,11 +17,11 @@ import NotificationService from '../../Database/NotificationService';
 
 // import {Container, Header, Left, Right, Body, Button, Title, Icon, Content} from 'native-base';
 const HEADER_HEIGHT = 64;
-const INFO_HEIGHT = 32;
+const INFO_HEIGHT = 42;
 class NotificationList extends Component {
   constructor(props) {
     super(props);
-   
+
     this.state = {
       storedList: [],
       selectedDate: '',
@@ -32,114 +33,103 @@ class NotificationList extends Component {
 
     // this.getBatteryLevel = this.getBatteryLevel.bind(this);
     this.datePicker = this.datePicker.bind(this);
-    this.callback = this.callback.bind(this);
+    this.showInfo = this.showInfo.bind(this);
+    this.hideInfo = this.hideInfo.bind(this);
 
-   }
+  }
 
-   componentDidMount() {
+  componentDidMount() {
     let notificationsList = NotificationService.getAll();
     this.setState({ notificationsList: notificationsList || [] });
-    NotificationService.registerListener((realm, change)=>{
+    NotificationService.registerListener((realm, change) => {
       let data = NotificationService.getAll();
-      
+      if(!this.state.selectedDate)
       this.setState({ notificationsList: data });
     });
-   }
-   async datePicker() {
-      try {
-        const dateObject = await DatePickerAndroid.open({
-          // Use `new Date()` for current date.
-          // May 25 2020. Month 0 is January.
-          date: new Date(2020, 4, 25)
-        });
-        if (dateObject.action !== DatePickerAndroid.dismissedAction) {
-          console.log('dateObject: ', dateObject);
-          this.setState({ selectedDate: new Date(dateObject.year, dateObject.month, dateObject.day) });
-          Animated.timing(                  // Animate over time
-            this.state.infoMargin,            // The animated value to drive
-            {
-              toValue: HEADER_HEIGHT,                   // Animate to opacity: 1 (opaque)
-              duration: 100,              // Make it take a while
-            }
-          ).start();
-          Animated.timing(                  // Animate over time
-            this.state.flatListMargin,            // The animated value to drive
-            {
-              toValue: 0,                   // Animate to opacity: 1 (opaque)
-              duration: 100,              // Make it take a while
-            }
-          ).start();
-          // Selected year, month (0-11), day
-        }
-      } catch ({code, message}) {
-        console.warn('Cannot open date picker', message);
-      }
-   }
-
-   callback(params) {
-     console.log('params: ORIGINAL ', params);
-    params = params['rawNotificationData']
-    if(params) {
-      params = JSON.parse(params);
-      var appName = params['appName']
-      var packageName = params['packageName']
-      var subText = params['android.subText'];
-      var title = params['android.title'];
-      var text = params['android.text'];
-      var bigText = params['android.bigText'];
-      var summeryText = params['android.summaryText'];
-      var timeStamp = params['timeStamp'];
-      var timeText = new Date(parseInt(timeStamp)).toLocaleString();
-      var notificationData = {appName, packageName, subText, title, text, bigText, timeStamp, summeryText, timeText};
-      AsyncStorage.getItem('log').then(storedList => {
-        if(storedList) { console.log('storedList: ', storedList); storedList = JSON.parse(storedList) } else { storedList = [] }
-        storedList.push(notificationData);
-        AsyncStorage.setItem('log', JSON.stringify(storedList));
-        this.setState({ storedList });
+  }
+  async datePicker() {
+    try {
+      const dateObject = await DatePickerAndroid.open({
+        // Use `new Date()` for current date.
+        // May 25 2020. Month 0 is January.
+        date: this.state.selectedDate || new Date()
       });
+      if (dateObject.action !== DatePickerAndroid.dismissedAction) {
+        let date = new Date(dateObject.year, dateObject.month, dateObject.day);
+        this.setState({ selectedDate: date,
+                        notificationsList: NotificationService.getForDate(date) });
+        this.showInfo();
+      }
+    } catch ({ code, message }) {
+      console.warn('Cannot open date picker', message);
     }
-    // let status = params['status'];
-    // let obj = {status, time: new Date().toLocaleString()};
   }
 
-  componentWillReceiveProps(nS, nP) {
-
+  showInfo() {
+    Animated.timing(                  // Animate over time
+      this.state.infoMargin,            // The animated value to drive
+      {
+        toValue: HEADER_HEIGHT,                   // Animate to opacity: 1 (opaque)
+        duration: 100,              // Make it take a while
+      }
+    ).start();
   }
-   
+
+  hideInfo() {
+    Animated.timing(                  // Animate over time
+      this.state.infoMargin,            // The animated value to drive
+      {
+        toValue: HEADER_HEIGHT - INFO_HEIGHT,                   // Animate to opacity: 1 (opaque)
+        duration: 100,              // Make it take a while
+      }
+    ).start(() => this.setState({ selectedDate: '', notificationsList: NotificationService.getAll() }));
+  }
+
   render() {
     const { notificationsList, selectedDate, infoMargin, flatListMargin } = this.state;
     console.log('notificationsList.length: ', notificationsList.length);
-    const infoViewUI = selectedDate ? (<Animated.View style={{...styles.infoView, marginTop: infoMargin}}>
-              <Text style={{textAlign: 'center'}}>{selectedDate.toLocaleDateString()}</Text>
-            </Animated.View>) : null;
+    const infoViewUI = selectedDate ? (<Animated.View style={{ ...styles.infoView, marginTop: infoMargin }}>
+      <TouchableOpacity style={styles.infoTextLayer} title="OPEN"
+        onPress={() => {
+          this.datePicker();
+        }}>
+        <Text style={{ ...styles.infoText, textAlign: 'center' }}>{moment(selectedDate).format('ll')}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.infoClose} title="OPEN"
+        onPress={() => {
+          this.hideInfo();
+        }}>
+        <Icon type="EvilIcons" name="close-o" style={{ fontSize: 24, color: COLOR.PRIMARY }} />
+      </TouchableOpacity>
+    </Animated.View>) : null;
     return (
       <View style={styles.container}>
-      
-          <View style={styles.headerView}>
-            <TouchableOpacity style={styles.boxBottomText} title="OPEN"
-              onPress={() =>
-                this.props.navigation.goBack()
-              }>
-              <Text style={{color: 'white'}}>Back</Text>
-        </TouchableOpacity>
-            <Text style={styles.headerText}>All Notifications</Text>
-            <TouchableOpacity style={styles.boxBottomText} title="OPEN"
-              onPress={() => {
-                // NotificationService.deleteAll();
-                this.datePicker();
-              }}>
-              <Icon type="FontAwesome" name="calendar" style={{fontSize: 24, color: 'white'}}/>
-            </TouchableOpacity>
-          </View>
-          {infoViewUI}
-          <Animated.FlatList
-            style={{...styles.bodyView, marginTop: flatListMargin}}
-            data={notificationsList}
-            keyExtractor={(item, index) => (index+'')}
-            renderItem={({item}, i) => {
-              return (<NotificationListRow item={item}/>)
-              }}
-          />
+
+        <View style={styles.headerView}>
+          <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+            onPress={() =>
+              this.props.navigation.goBack()
+            }>
+            <Text style={{ color: 'white' }}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerText}>All Notifications</Text>
+          <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+            onPress={() => {
+              // NotificationService.deleteAll();
+              this.datePicker();
+            }}>
+            <Icon type="FontAwesome" name="calendar" style={{ fontSize: 24, color: 'white' }} />
+          </TouchableOpacity>
+        </View>
+        {infoViewUI}
+        <Animated.FlatList
+          style={{ ...styles.bodyView, marginTop: selectedDate ? 0 : HEADER_HEIGHT }}
+          data={notificationsList}
+          keyExtractor={(item, index) => (index + '')}
+          renderItem={({ item }, i) => {
+            return (<NotificationListRow item={item} />)
+          }}
+        />
       </View>
     );
   }
@@ -172,21 +162,34 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   infoView: {
+    display: 'flex',
+    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     height: INFO_HEIGHT,
     backgroundColor: COLOR.SECONDARY,
   },
+  infoTextLayer: {
+    // borderWidth: 1,
+    // borderColor: COLOR.PRIMARY_LIGHT,
+    // paddingLeft: 5,
+    // paddingRight: 5,
+    // borderRadius: 10,
+  },
+  infoText: {
+    color: COLOR.PRIMARY,
+    fontSize: 16,
+  },
+  infoClose: {
+    position: 'absolute',
+    right: 15,
+  },
   bodyView: {
-    backgroundColor: '#ffffb3',
+    backgroundColor: '#616161',
     // marginTop: 64,
     height: 100,
-  },
-  listView: {
-    margin: 10,
-    marginBottom: 0,
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: 'black',
   }
 });
 

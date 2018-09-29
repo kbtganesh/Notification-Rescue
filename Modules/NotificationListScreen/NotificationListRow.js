@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import {StyleSheet, Text, View, Animated} from 'react-native';
+import { COLOR } from '../../Constants/Design';
+import moment from 'moment';
 
 class NotificationListRow extends Component {
   constructor(props) {
@@ -23,23 +25,56 @@ class NotificationListRow extends Component {
     const { fadeAnim } = this.state;
     console.log('("&&&&&&&&&&&&&&&&&& fadeAnim: ', item.text);
     return ( <View style={{...styles.listView}}>
-      <Text>{item.appName}</Text>
-      <Text>{item.createdAt.toLocaleTimeString()}</Text>
-      <Text>{item.title}</Text>
-      <Text>{item.text}</Text>
+      <Text style={styles.appName}>{item.appName}</Text>
+      <View style={styles.titleLine}>
+        <Text style={styles.textTitle}>{item.title}</Text>
+        <Text style={styles.textDate}>{moment(item.createdAt).format('LT')}</Text>
+      </View>
+      <Text style={styles.textContent}>{item.text}</Text>
     </View> );
   }
 }
 
 const styles = StyleSheet.create({
   listView: {
-    margin: 10,
+    position: 'relative',
+    margin: 15,
+    marginTop: 20,
     marginBottom: 0,
     padding: 10,
     borderWidth: 1,
     borderRadius: 5,
-    borderColor: 'black',
-  }
+    borderColor: COLOR.SECONDARY_LIGHT,
+  },
+  appName: {
+    position: 'absolute',
+    color: COLOR.SECONDARY_LIGHT,
+    top: -10,
+    left: 5,
+    paddingLeft: 5,
+    paddingRight: 5,
+    backgroundColor: '#616161',
+  },
+  titleLine: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+  textDate: {
+    color: 'lightgray',
+    // fontStyle: 'italic',
+    fontSize: 12,
+  },
+  textTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  textContent: {
+    color: 'white',
+    // fontWeight: bold,
+  },
 });
  
 export default NotificationListRow;
