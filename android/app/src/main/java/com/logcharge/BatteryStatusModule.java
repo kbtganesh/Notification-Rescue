@@ -49,8 +49,33 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void registerNotificationEvent(Callback successCallback) {
+    public void isNotificationEnabled(Callback callback) {
+        ComponentName cn = new ComponentName(getReactApplicationContext(), NotificationListener.class);
+        String flat = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "enabled_notification_listeners");
+        boolean enabled = flat != null && flat.contains(cn.flattenToString());
+        if(enabled){
+            Log.d("KBT", "NOTI ENABLE");
+        }else{
+            Log.d("KBT", "NOTI NOT ENABLE");
+        }
+        callback.invoke(enabled);
+    }
 
+    @ReactMethod
+    public void requestForNotificationAccess() {
+        Toast.makeText(getReactApplicationContext(), "Give me the fking notification access", Toast.LENGTH_LONG).show();
+        getReactApplicationContext().startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+    }
+
+    @ReactMethod
+    public void registerNotificationListener() {
+        Log.d("KBT", " registerNotificationListener Android registered listener");
+        LocalBroadcastManager.getInstance(mainContext).registerReceiver(myReceiver, new IntentFilter("NOTIFICATION_POSTED_KBT"));
+    }
+
+    @ReactMethod
+    public void registerNotificationEvent(Callback successCallback) {
+        Log.d("KBT", "Android registered listener");
         LocalBroadcastManager.getInstance(mainContext).registerReceiver(myReceiver, new IntentFilter("NOTIFICATION_POSTED_KBT"));
         ComponentName cn = new ComponentName(getReactApplicationContext(), NotificationListener.class);
         String flat = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "enabled_notification_listeners");
@@ -59,7 +84,7 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
             Toast.makeText(getReactApplicationContext(), "Give me the fucking notification access", Toast.LENGTH_LONG).show();
             getReactApplicationContext().startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
         }
-        successCallback.invoke("notification_peeermission", enabled);
+        successCallback.invoke("notification_permission", enabled);
         Log.d("KBT","Initial method, Is permission enabled?" + enabled);
 
 

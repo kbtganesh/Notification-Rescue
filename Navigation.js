@@ -2,11 +2,11 @@ import {
   createStackNavigator,
 } from 'react-navigation';
 import Home from './Modules/Home';
-import App from './App';
+import NotificationList from './Modules/NotificationListScreen/NotificationList';
 
 const Navigation = createStackNavigator({
   Home: { screen: Home },
-  ALL: { screen: App },
+  ALL: { screen: NotificationList },
 }, {
   initialRouteName: 'Home',
   mode: 'modal',
