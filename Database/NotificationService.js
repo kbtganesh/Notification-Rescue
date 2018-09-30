@@ -22,9 +22,19 @@ let NotificationService = {
     let today = date;
     let nextDay = moment(today).add(1, 'days').toDate();
     let dataList = repository.objects('Notification').filtered("createdAt >= $0 && createdAt < $1", today, nextDay);
-    console.log('DDDDDDDDDDDDDD dataList: ', dataList);
     return dataList;
   },
+  filterByAppAndDate: function(packageName, date) {
+    let dataList = repository.objects('Notification').filtered("packageName = $0", packageName);
+    if(date){
+      let today = date;
+      let nextDay = moment(today).add(1, 'days').toDate();
+      dataList = dataList.filtered("createdAt >= $0 && createdAt < $1", today, nextDay);
+    }
+    dataList = dataList.sorted('createdAt', true);
+    return dataList;
+  },
+
   getAll: function (sortBy) {
     // if (!sortBy) sortBy = [['completed', false], ['updatedAt', true]];
     // return repository.objects('Notification').sorted(sortBy);
@@ -47,6 +57,9 @@ let NotificationService = {
 
   registerListener: function (listenerFunction) {
     repository.addListener('change', listenerFunction);
+  },
+  removeListener: function (listenerFunction) {
+    repository.removeListener('change', listenerFunction);
   }
 };
 

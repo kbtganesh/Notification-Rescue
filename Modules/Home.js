@@ -92,9 +92,9 @@ class Home extends Component {
         <View style={styles.bodyView}>
           <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'space-around' }} style={{ width: '100%', padding: 30 }}>
             <Box type='ALL' navigate={navigate} />
-            <Box type='APP' />
-            <Box type='WHATSAPP' />
-            <Box type='OTHER' />
+            <Box type='APP' navigate={navigate}/>
+            <Box type='WHATSAPP' navigate={navigate}/>
+            <Box type='OTHER' navigate={navigate}/>
           </ScrollView>
         </View>
 
@@ -125,7 +125,7 @@ class Box extends Component {
         <View style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }}>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
             onPress={() =>
-              navigate('ALL', { name: 'All Notifications' })
+              navigate(props.type, { name: BOX_TITLE[props.type] })
             }>
             <Text style={styles.boxBottomText}>OPEN</Text>
           </TouchableOpacity>

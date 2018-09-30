@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     left: 5,
     paddingLeft: 5,
     paddingRight: 5,
-    backgroundColor: '#616161',
+    backgroundColor: '#263238',
   },
   titleLine: {
     display: 'flex',

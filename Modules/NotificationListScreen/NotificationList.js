@@ -27,6 +27,7 @@ class NotificationList extends Component {
       selectedDate: '',
       notificationsList: [],
       selectedDate: '',
+      filterByApp: '',
       infoMargin: new Animated.Value(0),
       flatListMargin: new Animated.Value(HEADER_HEIGHT),
     };
@@ -35,18 +36,54 @@ class NotificationList extends Component {
     this.datePicker = this.datePicker.bind(this);
     this.showInfo = this.showInfo.bind(this);
     this.hideInfo = this.hideInfo.bind(this);
+    this.notificationListenerCallback = this.notificationListenerCallback.bind(this);
+    this.getNotifications = this.getNotifications.bind(this);
+
+  }
+
+  getNotifications() {
+    const { navigation } = this.props;
+    const { selectedDate } = this.state;
+    const filterByApp = navigation.getParam('packageName');
+    let dataList;
+    if(filterByApp || selectedDate){
+      if(filterByApp && selectedDate){
+        dataList = NotificationService.filterByAppAndDate(filterByApp, selectedDate);
+      }else if(filterByApp){
+        dataList = NotificationService.filterByAppAndDate(filterByApp);
+      }else{
+        dataList = NotificationService.getForDate(selectedDate);
+      }
+    }else{
+      dataList = NotificationService.getAll();
+    }
+    return dataList || [];
 
   }
 
   componentDidMount() {
-    let notificationsList = NotificationService.getAll();
-    this.setState({ notificationsList: notificationsList || [] });
-    NotificationService.registerListener((realm, change) => {
-      let data = NotificationService.getAll();
-      if(!this.state.selectedDate)
-      this.setState({ notificationsList: data });
-    });
+    const { navigation } = this.props;
+    const filterByApp = navigation.getParam('packageName');
+    let notificationsList;
+    if(filterByApp){
+      notificationsList = NotificationService.filterByAppAndDate(filterByApp);
+    }else{
+      notificationsList = NotificationService.getAll();
+    }
+    console.log('ARRRRRRRRRRRRRAY', JSON.stringify(notificationsList.map(item => item)));
+    this.setState({ notificationsList: notificationsList || [], filterByApp: filterByApp || '' });
+    NotificationService.registerListener(this.notificationListenerCallback);
   }
+  
+  notificationListenerCallback() {
+    this.setState({ notificationsList: this.getNotifications() });
+  }
+  
+  componentWillUnmount() {
+    NotificationService.removeListener(this.notificationListenerCallback);
+
+  }
+
   async datePicker() {
     try {
       const dateObject = await DatePickerAndroid.open({
@@ -56,8 +93,14 @@ class NotificationList extends Component {
       });
       if (dateObject.action !== DatePickerAndroid.dismissedAction) {
         let date = new Date(dateObject.year, dateObject.month, dateObject.day);
-        this.setState({ selectedDate: date,
-                        notificationsList: NotificationService.getForDate(date) });
+        const { filterByApp } = this.state;
+        let notificationsList;
+        if(filterByApp) {
+          notificationsList = NotificationService.filterByAppAndDate(filterByApp, date);
+        }else{
+          notificationsList = NotificationService.getForDate(date);
+        }
+        this.setState({ selectedDate: date, notificationsList});
         this.showInfo();
       }
     } catch ({ code, message }) {
@@ -82,11 +125,15 @@ class NotificationList extends Component {
         toValue: HEADER_HEIGHT - INFO_HEIGHT,                   // Animate to opacity: 1 (opaque)
         duration: 100,              // Make it take a while
       }
-    ).start(() => this.setState({ selectedDate: '', notificationsList: NotificationService.getAll() }));
+    ).start(() => this.setState({ selectedDate: '' }, ()=>{this.setState({ notificationsList: this.getNotifications() })}));
   }
 
   render() {
     const { notificationsList, selectedDate, infoMargin, flatListMargin } = this.state;
+    const { navigation } = this.props;
+    let headerTitle = navigation.getParam('name');
+
+
     console.log('notificationsList.length: ', notificationsList.length);
     const infoViewUI = selectedDate ? (<Animated.View style={{ ...styles.infoView, marginTop: infoMargin }}>
       <TouchableOpacity style={styles.infoTextLayer} title="OPEN"
@@ -112,7 +159,7 @@ class NotificationList extends Component {
             }>
             <Text style={{ color: 'white' }}>Back</Text>
           </TouchableOpacity>
-          <Text style={styles.headerText}>All Notifications</Text>
+          <Text style={styles.headerText}>{headerTitle}</Text>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
             onPress={() => {
               // NotificationService.deleteAll();
@@ -187,7 +234,7 @@ const styles = StyleSheet.create({
     right: 15,
   },
   bodyView: {
-    backgroundColor: '#616161',
+    backgroundColor: '#263238',
     // marginTop: 64,
     height: 100,
   }
