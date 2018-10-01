@@ -23,7 +23,6 @@ class NotificationListRow extends Component {
   render() { 
     const { item } = this.props;
     const { fadeAnim } = this.state;
-    console.log('("&&&&&&&&&&&&&&&&&& fadeAnim: ', item.text);
     return ( <View style={{...styles.listView}}>
       <Text style={styles.appName}>{item.appName}</Text>
       <View style={styles.titleLine}>

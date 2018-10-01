@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeModules, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { NativeModules, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { Icon } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
@@ -7,9 +7,9 @@ import { COLOR } from '../Constants/Design';
 
 const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Other' }
 const BOX_DESC = {
-  'ALL': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-  'APP': 'Nulla lectus mauris, volutpat at congue eget, finibus eu',
-  'WHATSAPP': 'Sed faucibus porttitor ipsum pellentesque et congue erat',
+  'ALL': 'Find all the notifications received in your mobile',
+  'APP': 'Get the categorized list of notifications based on application',
+  'WHATSAPP': 'Read your whastapp chats including the deleted messages',
   'OTHER': 'Cras quis felis vel metus lobortis porta a ut ligula'
 }
 class Home extends Component {
@@ -122,14 +122,16 @@ class Box extends Component {
           <Text style={styles.boxTopTitle}>{BOX_TITLE[props.type]}</Text>
           <Text style={styles.boxTopDesc}>{BOX_DESC[props.type]}</Text>
         </View>
-        <View style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }}>
-          <TouchableOpacity style={styles.boxBottomText} title="OPEN"
-            onPress={() =>
+        <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() =>
               navigate(props.type, { name: BOX_TITLE[props.type] })
             }>
+          {/* <TouchableOpacity style={styles.boxBottomText} title="OPEN"
+            onPress={() =>
+              navigate(props.type, { name: BOX_TITLE[props.type] })
+            }> */}
             <Text style={styles.boxBottomText}>OPEN</Text>
-          </TouchableOpacity>
-        </View>
+          {/* </TouchableOpacity> */}
+        </TouchableHighlight>
       </View>
     )
   }
@@ -146,8 +148,9 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   headerView: {
-    flex: 4,
+    flex: 3,
 
+    elevation: 10,
     width: '100%',
     backgroundColor: COLOR.PRIMARY,
   },
@@ -157,10 +160,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 10,
     backgroundColor: COLOR.PRIMARY,
-    borderBottomRightRadius: 100,
-    borderBottomLeftRadius: 100,
+    // borderBottomRightRadius: 100,
+    // borderBottomLeftRadius: 100,
   },
 
   headerText: {

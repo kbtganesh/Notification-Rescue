@@ -42,7 +42,10 @@ let NotificationService = {
   },
 
   save: function (notification) {
-    // if (repository.objects('Notification').filtered("title = '" + todo.title + "'").length) return;
+    if (repository.objects('Notification').filtered("text = $0 && createdAt = $1", notification.text, notification.createdAt).length){
+     console.log('Returning notification ', notification);
+     return; 
+    }
     notification = appendEmptyString(notification);
     repository.write(() => {
       repository.create('Notification', notification);
