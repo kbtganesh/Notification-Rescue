@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Dimensions, TouchableOpacity, NativeModules, Image, AsyncStorage } from 'react-native';
 import _ from 'underscore';
 
 import { Icon } from 'native-base';
@@ -14,14 +14,24 @@ class AppWiseNotification extends Component {
     super(props);
     this.state = {
       applicationsList: [],
+      appIcons: {},
     }
     this.onPressApplication = this.onPressApplication.bind(this);
+    this.iconCallback = this.iconCallback.bind(this);
   }
   componentDidMount() {
     let notificationsList = NotificationService.getAll();
     let applicationsList = _.uniq(notificationsList, (obj) => obj.packageName);
+    applicationsList = _.sortBy(applicationsList, 'appName');
+    let packageNameList = applicationsList.map(item => item.packageName);
+    NativeModules.BatteryStatus.getIcon(JSON.stringify(packageNameList), this.iconCallback);
     this.setState({ applicationsList });
-    console.log('applicationsList: ', applicationsList);
+    // console.log('applicationsList: ', applicationsList);
+  }
+
+  iconCallback(params) {
+    let appIcons = JSON.parse(params['icons']);
+    this.setState({ appIcons });
   }
 
   onPressApplication(packageName, appName) {
@@ -30,6 +40,7 @@ class AppWiseNotification extends Component {
   }
   render() {
     const { navigation } = this.props;
+    const { appIcons } = this.state;
     let headerTitle = navigation.getParam('name');
     return (
       <View style={styles.container}>
@@ -49,8 +60,8 @@ class AppWiseNotification extends Component {
             <Icon type="FontAwesome" name="calendar" style={{ fontSize: 24, color: 'white' }} />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{justifyContent: 'flex-start'}} style={styles.bodyView}>
-          {this.state.applicationsList.map((item, i) => <AppBox key={`app-box-${i}`} onPress={this.onPressApplication} appName={item.appName} packageName={item.packageName}/>)}
+        <ScrollView contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}} style={styles.bodyView}>
+          {this.state.applicationsList.map((item, i) => <AppBox key={`app-box-${i}`} onPress={this.onPressApplication} appName={item.appName} packageName={item.packageName} appIcon = {appIcons[item.packageName]}/>)}
         </ScrollView>
       </View>
     )
@@ -58,9 +69,18 @@ class AppWiseNotification extends Component {
 }
 
 const AppBox = (props) => {
+  let {height, width} = Dimensions.get('window');
+  const { appIcon } = props;
+  if(appIcon){
+
+    console.log('appIcon: ', props.packageName);
+    console.log('appIcon: ', appIcon);
+  }
   return (
-    <TouchableOpacity style={styles.appBox} onPress={()=>props.onPress(props.packageName, props.appName)}>
-      <Text>{props.appName}</Text>
+    <TouchableOpacity style={{...styles.appBox, width: width/5, height: width/5}} onPress={()=>props.onPress(props.packageName, props.appName)}>
+      <Image style={{...styles.appIcon}} resizeMode={'contain'} source={{uri: `data:image/png;base64,${appIcon}` || ''}}>
+      </Image>
+      <Text style={styles.appName}>{props.appName}</Text>
     </TouchableOpacity>
   )
 }
@@ -118,21 +138,32 @@ const styles = StyleSheet.create({
   },
   bodyView: {
     display: 'flex',
-    flexDirection: 'column',
     backgroundColor: COLOR.SECONDARY,
     marginTop: 64,
-    // paddingBottom: 240,
-    height: '100%',
   },
   appBox: {
-    height: 60,
-    // marginTop: 20,
-    // marginLeft: 20,
-    // marginRight: 20,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    margin: 20,
+    padding: 5,
+    // borderColor: 'black',
+    // borderWidth: 1,
+    // borderRadius: 5,
   },
+  appIcon: { 
+    width: '60%', 
+    height: '60%', 
+    // backgroundColor: 'orange', 
+  },
+  appName: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    width: '100%', 
+    textAlign: 'center'
+  },
+  
 });
 
 export default AppWiseNotification;
