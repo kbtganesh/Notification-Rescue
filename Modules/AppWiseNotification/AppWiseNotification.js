@@ -77,10 +77,10 @@ const AppBox = (props) => {
     console.log('appIcon: ', appIcon);
   }
   return (
-    <TouchableOpacity style={{...styles.appBox, width: width/5, height: width/5}} onPress={()=>props.onPress(props.packageName, props.appName)}>
+    <TouchableOpacity style={{...styles.appBox, width: width/4, height: width/4}} onPress={()=>props.onPress(props.packageName, props.appName)}>
       <Image style={{...styles.appIcon}} resizeMode={'contain'} source={{uri: `data:image/png;base64,${appIcon}` || ''}}>
       </Image>
-      <Text style={styles.appName}>{props.appName}</Text>
+      <View style={{...styles.nameView}}><Text style={styles.appName}>{props.appName}</Text></View>
     </TouchableOpacity>
   )
 }
@@ -146,19 +146,35 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
     alignItems: 'center',
-    margin: 20,
-    padding: 5,
-    // borderColor: 'black',
-    // borderWidth: 1,
-    // borderRadius: 5,
+    margin: 12,
+    marginTop: 20,
+    backgroundColor: '#37474f',
+    // borderColor: 'white',
+    // borderWidth: 2,
+    borderRadius: 10,
+    elevation: 5,
   },
   appIcon: { 
-    width: '60%', 
-    height: '60%', 
+    flex: 4,
+    width: '40%', 
+    height: '40%', 
     // backgroundColor: 'orange', 
   },
+  nameView: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 5,
+    paddingRight: 5,
+    backgroundColor: '#eeeeee', 
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    width: '100%'
+  },
+
   appName: {
-    fontSize: 12,
+    color: '#37474f',
+    fontSize: 13,
     fontWeight: 'bold',
     width: '100%', 
     textAlign: 'center'
