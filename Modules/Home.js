@@ -67,8 +67,10 @@ class Home extends Component {
       var text = params['android.text'];
       var bigText = params['android.bigText'];
       var summeryText = params['android.summaryText'];
+      var textLines = params['android.textLines'] || [];
+      var ticker = params['ticker'];
       var createdAt = new Date(parseInt(params['timeStamp']));
-      var notificationObject = {appName, packageName, subText, title, text, bigText, summeryText, createdAt};
+      var notificationObject = {appName, packageName, subText, title, text, bigText, summeryText, createdAt, textLines, ticker};
       NotificationService.save(notificationObject);
       
     }

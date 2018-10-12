@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet, Text, View, Animated} from 'react-native';
+import {StyleSheet, Text, View, Animated, TouchableHighlight} from 'react-native';
 import { COLOR } from '../../Constants/Design';
 import moment from 'moment';
 
@@ -11,7 +11,6 @@ class NotificationListRow extends Component {
      }
   }
   componentDidMount() {
-    console.log("&&&&&&&&&&&&&&&&&& NEW ITEM ADDED : ", this.props.item.text);
     // Animated.timing(                  // Animate over time
     //   this.state.fadeAnim,            // The animated value to drive
     //   {
@@ -23,14 +22,16 @@ class NotificationListRow extends Component {
   render() { 
     const { item } = this.props;
     const { fadeAnim } = this.state;
-    return ( <View style={{...styles.listView}}>
+    return ( <TouchableHighlight style={{...styles.listView}} onPress={this.props.onPress}>
+    <React.Fragment>
       <Text style={styles.appName}>{item.appName}</Text>
       <View style={styles.titleLine}>
         <Text style={styles.textTitle}>{item.title}</Text>
         <Text style={styles.textDate}>{moment(item.createdAt).format('LT')}</Text>
       </View>
       <Text style={styles.textContent}>{item.text}</Text>
-    </View> );
+      </React.Fragment>
+    </TouchableHighlight> );
   }
 }
 
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
   },
   appName: {
     position: 'absolute',
+    fontWeight: '500',
     color: COLOR.SECONDARY_LIGHT,
     top: -10,
     left: 5,
@@ -67,12 +69,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   textTitle: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: COLOR.PRIMARY_TEXT,
+    fontWeight: '500',
+    width: '80%',
+    lineHeight: 20,
+    marginBottom: 8,
+    // backgroundColor: 'red',
   },
   textContent: {
     color: 'white',
-    // fontWeight: bold,
+    marginBottom: 5,
   },
 });
  

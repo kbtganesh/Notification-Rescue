@@ -3,6 +3,7 @@ import {
 } from 'react-navigation';
 import Home from './Modules/Home';
 import NotificationList from './Modules/NotificationListScreen/NotificationList';
+import NotificationDetail from './Modules/NotificationListScreen/NotificationDetail';
 import AppWiseNotification from './Modules/AppWiseNotification/AppWiseNotification';
 import WhatsappScreen from './Modules/WhatsappMessages/WhatsappScreen';
 import WhatsappChat from './Modules/WhatsappMessages/WhatsappChat';
@@ -13,6 +14,7 @@ const Navigation = createStackNavigator({
   APP: { screen: AppWiseNotification },
   WHATSAPP: { screen: WhatsappScreen },
   WHATSAPP_CHAT: { screen: WhatsappChat },
+  NotificationDetail: { screen: NotificationDetail },
 }, {
   initialRouteName: 'Home',
   mode: 'modal',

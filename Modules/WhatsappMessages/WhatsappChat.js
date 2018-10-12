@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
 import _ from 'underscore';
+import moment from 'moment';
 
 import { Icon } from 'native-base';
 import { COLOR } from '../../Constants/Design';
@@ -20,6 +21,7 @@ class WhatsappScreen extends Component {
   componentDidMount() {
     // let notificationsList = NotificationService.fchatListilterByAppAndDate('com.whatsapp');
     let chatList = this.props.navigation.getParam('chatList')
+    console.log('CHAT chatList: ', chatList);
     this.setState({ chatList });
   }
 
@@ -49,8 +51,8 @@ class WhatsappScreen extends Component {
             <Icon type="FontAwesome" name="refresh" style={{ fontSize: 24, color: 'white' }} />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
-          {chatList.map((item, i) => <AppBox key={`whatsapp-chat-box-${i}`} onPress={this.onPressApplication} text={item.text} personName = {item.personName} />)}
+        <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-end' }} style={styles.bodyView}>
+          {chatList.reverse().map((item, i) => <AppBox key={`whatsapp-chat-box-${i}`} onPress={this.onPressApplication} text={item.text} personName = {item.personName} createdAt={item.createdAt} />)}
         </ScrollView>
       </View>
     )
@@ -59,10 +61,15 @@ class WhatsappScreen extends Component {
 
 const AppBox = (props) => {
   console.log('props: ', props);
+  let sameDay = moment(props.createdAt).isSame(new Date(), 'days');
+  let time = sameDay ? moment(props.createdAt).format('LT') : moment(props.createdAt).format('lll');
   return (
     <TouchableOpacity style={styles.appBox} onPress={() => props.onPress(props.packageName, props.appName)}>
-      {props.personName && <Text>{props.personName}</Text>}
-      <Text>{props.text}</Text>
+    <View style={styles.chatBubble}>
+      {props.personName && <Text style={styles.personName}>{props.personName}</Text>}
+      <Text style={styles.textMessage}>{props.text}</Text>
+      <Text style={styles.time}>{time}</Text>
+    </View>
     </TouchableOpacity>
   )
 }
@@ -86,56 +93,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: HEADER_HEIGHT,
     width: '100%',
-    backgroundColor: COLOR.PRIMARY,
+    backgroundColor: COLOR.WHATSAPP,
   },
   headerText: {
     paddingLeft: 10,
     fontSize: 18,
     color: 'white',
   },
-  infoView: {
-    display: 'flex',
-    position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: 32,
-    backgroundColor: COLOR.SECONDARY,
-  },
-  infoTextLayer: {
-    // borderWidth: 1,
-    // borderColor: COLOR.PRIMARY_LIGHT,
-    // paddingLeft: 5,
-    // paddingRight: 5,
-    // borderRadius: 10,
-  },
-  infoText: {
-    color: COLOR.PRIMARY,
-    fontSize: 16,
-  },
-  infoClose: {
-    position: 'absolute',
-    right: 15,
-  },
   bodyView: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: COLOR.SECONDARY,
+    backgroundColor: COLOR.WHATSAPP_CHAT_SCRN,
     marginTop: 64,
+    padding: 10,
     // paddingBottom: 240,
     height: '100%',
   },
   appBox: {
-    // height: 80,
-    // alignItems: 'center',
-    // marginTop: 20,
-    // marginLeft: 20,
-    // marginRight: 20,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
+    marginBottom: 10,
+    // backgroundColor: 'white',
   },
+  chatBubble: {
+    display: 'flex',
+    width: '70%',
+    padding: 10,
+    paddingLeft: 20,
+    paddingBottom: 20,
+    borderRadius: 25,
+    position: 'relative',
+    elevation: 1,
+    // borderWidth: 1,
+    // borderColor: COLOR.LOVELY_GRAY,
+    backgroundColor: 'white',
+  },
+  personName: {
+    marginBottom: 10,
+    fontWeight: 'bold',
+    // backgroundColor: 'blue',
+  },
+  textMessage: {
+    
+  },
+  time: {
+    fontSize: 12,
+    position: 'absolute',
+    right: 20,
+    bottom: 5,
+  }
 });
 
 export default WhatsappScreen;

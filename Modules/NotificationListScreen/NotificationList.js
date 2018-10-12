@@ -7,7 +7,7 @@
  */
 
 import React, { Component } from 'react';
-import { DatePickerAndroid, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
+import { DatePickerAndroid, StyleSheet, Text, View, ScrollView, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
 import moment from 'moment';
 
 import { Icon } from 'native-base';
@@ -37,6 +37,7 @@ class NotificationList extends Component {
     this.showInfo = this.showInfo.bind(this);
     this.hideInfo = this.hideInfo.bind(this);
     this.notificationListenerCallback = this.notificationListenerCallback.bind(this);
+    this.onNotificationPress = this.onNotificationPress.bind(this);
     this.getNotifications = this.getNotifications.bind(this);
 
   }
@@ -72,6 +73,7 @@ class NotificationList extends Component {
     }
     console.log('ARRRRRRRRRRRRRAY', JSON.stringify(notificationsList.map(item => item)));
     this.setState({ notificationsList: notificationsList || [], filterByApp: filterByApp || '' });
+    console.log('last 10', notificationsList.slice(0,10));
     NotificationService.registerListener(this.notificationListenerCallback);
   }
   
@@ -128,8 +130,13 @@ class NotificationList extends Component {
     ).start(() => this.setState({ selectedDate: '' }, ()=>{this.setState({ notificationsList: this.getNotifications() })}));
   }
 
+  onNotificationPress(notificationObject) {
+    const { navigate } = this.props.navigation;
+    navigate('NotificationDetail', { name: notificationObject.appName, notificationObject })
+  }
+
   render() {
-    const { notificationsList, selectedDate, infoMargin, flatListMargin } = this.state;
+    const { notificationsList, selectedDate, notificationObject, flatListMargin } = this.state;
     const { navigation } = this.props;
     let headerTitle = navigation.getParam('name');
 
@@ -174,9 +181,10 @@ class NotificationList extends Component {
           data={notificationsList}
           keyExtractor={(item, index) => (index + '')}
           renderItem={({ item }, i) => {
-            return (<NotificationListRow item={item} />)
+            return (<NotificationListRow item={item} onPress={()=>this.onNotificationPress(item)}/>)
           }}
         />
+        
       </View>
     );
   }

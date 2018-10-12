@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
+import { Container, Header, Content, Tab, Tabs } from 'native-base';
 import _ from 'underscore';
 
 import { Icon } from 'native-base';
@@ -14,45 +15,62 @@ class WhatsappScreen extends Component {
     super(props);
     this.state = {
       applicationsList: [],
-      chatObjects: {},
+      singleChat: {},
+      groupChat: {},
     }
     this.onPressChatTitle = this.onPressChatTitle.bind(this);
+    this.loadWhatsappData = this.loadWhatsappData.bind(this);
   }
   componentDidMount() {
+    this.loadWhatsappData();
+  }
+
+  loadWhatsappData() {
     let notificationsList = NotificationService.filterByAppAndDate('com.whatsapp');
 
-    let chatObjects = {};
+    let singleChat = {};
+    let groupChat = {};
     notificationsList.forEach(item => {
+      console.log('item.title: ', item.title);
       let [chatTitle, personName] = item.title.split(":");
       chatTitle = chatTitle.trim();
       personName = personName ? personName.trim() : '';
       if (chatTitle.includes('messages)')) {
         chatTitle = chatTitle.slice(0, chatTitle.lastIndexOf('(')).trim();
       }
-      if(personName){
+      if (personName.match(".*[a-zA-Z0-9]+.*")) {
         item.personName = personName;
         item.isGroup = true;
       }
-      if (chatObjects && chatObjects[chatTitle]) {
-        chatObjects[chatTitle].push(item);
+      if (!item.isGroup) {
+        if (singleChat && singleChat[chatTitle]) {
+          singleChat[chatTitle].push(item);
+        } else {
+          singleChat[chatTitle] = [item];
+        }
       } else {
-        chatObjects[chatTitle] = [item];
+        if (groupChat && groupChat[chatTitle]) {
+          groupChat[chatTitle].push(item);
+        } else {
+          groupChat[chatTitle] = [item];
+        }
       }
     })
 
 
-    this.setState({ chatObjects });
-    console.log('applicationsList: ', Object.keys(chatObjects));
+    this.setState({ singleChat, groupChat });
+    console.log('applicationsList: Group', Object.keys(groupChat));
+    console.log('applicationsList: Single', Object.keys(singleChat));
   }
 
-  onPressChatTitle(chatTitle) {
-    const { chatObjects } = this.state;
+  onPressChatTitle(chatTitle, type) {
+    const { singleChat, groupChat } = this.state;
     const { navigate } = this.props.navigation;
-    navigate('WHATSAPP_CHAT', { name: chatTitle, chatList: chatObjects[chatTitle] })
+    navigate('WHATSAPP_CHAT', { name: chatTitle, chatList: type === 'single' ? singleChat[chatTitle] : groupChat[chatTitle] })
   }
   render() {
     const { navigation } = this.props;
-    const { chatObjects } = this.state;
+    const { singleChat, groupChat } = this.state;
     let headerTitle = navigation.getParam('name');
     return (
       <View style={styles.container}>
@@ -66,15 +84,27 @@ class WhatsappScreen extends Component {
           <Text style={styles.headerText}>{headerTitle}</Text>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
             onPress={() => {
-              // NotificationService.deleteAll();
-              // this.datePicker();
+              this.loadWhatsappData();
             }}>
             <Icon type="FontAwesome" name="refresh" style={{ fontSize: 24, color: 'white' }} />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
-          {Object.keys(chatObjects).map((item, i) => <AppBox key={`whatsapp-name-box-${i}`} onPress={this.onPressChatTitle} chatTitle={item} packageName={item.packageName} />)}
-        </ScrollView>
+        <Container style={{ marginTop: HEADER_HEIGHT }}>
+          <Tabs>
+            <Tab heading="Groups" tabStyle={styles.tabStyle} textStyle={styles.tabTextStyle} activeTabStyle={styles.activeTabStyle}>
+              <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
+                {Object.keys(groupChat).map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
+                  onPress={() => { this.onPressChatTitle(item, 'group') }} chatTitle={item} packageName={item.packageName} />)}
+              </ScrollView>
+            </Tab>
+            <Tab heading="Contacts" tabStyle={styles.tabStyle} textStyle={styles.tabTextStyle} activeTabStyle={styles.activeTabStyle}>
+              <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
+                {Object.keys(singleChat).map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
+                  onPress={() => { this.onPressChatTitle(item, 'single') }} chatTitle={item} packageName={item.packageName} />)}
+              </ScrollView>
+            </Tab>
+          </Tabs>
+        </Container>
       </View>
     )
   }
@@ -82,9 +112,14 @@ class WhatsappScreen extends Component {
 
 const AppBox = (props) => {
   console.log('props: ', props);
+  let chatTitleWithoutEmojies = props.chatTitle.replace(/([\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2694-\u2697]|\uD83E[\uDD10-\uDD5D])/g, '')
+  let firstLetter = (chatTitleWithoutEmojies.match(/[a-zA-Z0-9]/) || []).pop() || chatTitleWithoutEmojies[0];
   return (
-    <TouchableOpacity style={styles.appBox} onPress={() => props.onPress(props.chatTitle)}>
-      <Text>{props.chatTitle}</Text>
+    <TouchableOpacity style={styles.appBox} onPress={props.onPress}>
+      <View style={styles.letterIcon}>
+        <Text style={styles.letterIconText}>{firstLetter}</Text>
+      </View>
+      <Text style={styles.chatTitle}>{props.chatTitle}</Text>
     </TouchableOpacity>
   )
 }
@@ -95,7 +130,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     // justifyContent: 'center',
     // alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: COLOR.WHATSAPP_CHAT_SCRN,
   },
   headerView: {
     display: 'flex',
@@ -108,55 +143,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: HEADER_HEIGHT,
     width: '100%',
-    backgroundColor: COLOR.PRIMARY,
+    backgroundColor: COLOR.WHATSAPP,
   },
   headerText: {
     paddingLeft: 10,
     fontSize: 18,
     color: 'white',
   },
-  infoView: {
-    display: 'flex',
-    position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: 32,
-    backgroundColor: COLOR.SECONDARY,
-  },
-  infoTextLayer: {
-    // borderWidth: 1,
-    // borderColor: COLOR.PRIMARY_LIGHT,
-    // paddingLeft: 5,
-    // paddingRight: 5,
-    // borderRadius: 10,
-  },
-  infoText: {
-    color: COLOR.PRIMARY,
-    fontSize: 16,
-  },
-  infoClose: {
-    position: 'absolute',
-    right: 15,
-  },
   bodyView: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: COLOR.SECONDARY,
-    marginTop: 64,
+    backgroundColor: COLOR.WHATSAPP_CHAT_SCRN,
+    // marginTop: 64,
     // paddingBottom: 240,
     height: '100%',
   },
   appBox: {
-    height: 60,
-    // marginTop: 20,
-    // marginLeft: 20,
-    // marginRight: 20,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: COLOR.LIGHT_GRAY,
   },
+  letterIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4b636e',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  letterIconText: {
+    fontSize: 18,
+    color: COLOR.PRIMARY_TEXT
+  },
+  chatTitle: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  tabStyle: {
+    backgroundColor: COLOR.WHATSAPP_DARK
+  },
+  tabTextStyle: {
+    color: 'white',
+  },
+  activeTabStyle: {
+    backgroundColor: COLOR.WHATSAPP_DARK
+  }
 });
 
 export default WhatsappScreen;

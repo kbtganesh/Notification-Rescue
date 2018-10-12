@@ -180,6 +180,9 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
             iconCallback.invoke(params);
 
         } catch (JSONException e) {
+            WritableMap params = Arguments.createMap();
+            params.putString("icons", "");
+            iconCallback.invoke(params);
             Log.d("KBTTBK", "ERROR");
             Log.d("KBTTBK", e.getMessage());
             e.printStackTrace();

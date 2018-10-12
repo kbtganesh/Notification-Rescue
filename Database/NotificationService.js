@@ -13,6 +13,8 @@ let repository = new Realm({
       bigText: 'string',
       summeryText: 'string',
       createdAt: 'date',
+      ticker: 'string',
+      textLines: 'string?[]',
     }
   }]
 });
@@ -42,9 +44,14 @@ let NotificationService = {
   },
 
   save: function (notification) {
+    console.log('save notification: ', notification);
     if (repository.objects('Notification').filtered("text = $0 && createdAt = $1", notification.text, notification.createdAt).length){
      console.log('Returning notification ', notification);
      return; 
+    }
+    if(!(notification.text || notification.title || notification.bigText || notification.summeryText || notification.textLines.length > 0)) {
+      console.log('Returning notification coz of empty', notification);
+      return; 
     }
     notification = appendEmptyString(notification);
     repository.write(() => {
