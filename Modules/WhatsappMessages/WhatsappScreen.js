@@ -123,7 +123,7 @@ const AppBox = (props) => {
       <AdMobBanner
         adSize="fullBanner"
         adUnitID="ca-app-pub-4058004042775880/7760195164"
-        onAdFailedToLoad={error => console.error(error)}
+        onAdFailedToLoad={error => console.warn(error)}
       />
     )
   }else{

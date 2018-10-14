@@ -133,7 +133,7 @@ class Box extends Component {
               adSize="fullBanner"
               adUnitID="ca-app-pub-4058004042775880/8130239563"
               // testDevices={[AdMobBanner.simulatorId]}
-              onAdFailedToLoad={error => console.error(error)}
+              onAdFailedToLoad={error => console.warn(error)}
             />}
         </TouchableHighlight>
       </View>
