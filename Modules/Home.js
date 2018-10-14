@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { NativeModules, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { AdMobBanner } from 'react-native-admob'
 import { Icon } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
@@ -118,6 +119,7 @@ class Box extends Component {
     let props = this.props;
     let BottomColor = props.type + '_DARK';
     const { navigate } = props;
+    console.log('AdMobBanner.simulatorId', AdMobBanner.simulatorId);
     return (
       <View style={{ ...styles.box, marginBottom: props.type === 'OTHER' ? 50 : 30 }}>
         <View style={{ ...styles.boxTop, backgroundColor: COLOR[props.type] }}>
@@ -127,12 +129,12 @@ class Box extends Component {
         <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() =>
               navigate(props.type, { name: BOX_TITLE[props.type] })
             }>
-          {/* <TouchableOpacity style={styles.boxBottomText} title="OPEN"
-            onPress={() =>
-              navigate(props.type, { name: BOX_TITLE[props.type] })
-            }> */}
-            <Text style={styles.boxBottomText}>OPEN</Text>
-          {/* </TouchableOpacity> */}
+            {props.type !== 'OTHER' ? <Text style={styles.boxBottomText}>OPEN</Text> : <AdMobBanner
+              adSize="fullBanner"
+              adUnitID="ca-app-pub-4058004042775880/8130239563"
+              // testDevices={[AdMobBanner.simulatorId]}
+              onAdFailedToLoad={error => console.error(error)}
+            />}
         </TouchableHighlight>
       </View>
     )

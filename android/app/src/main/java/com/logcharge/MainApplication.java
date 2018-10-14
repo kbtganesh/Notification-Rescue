@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
+import com.sbugert.rnadmob.RNAdMobPackage;
 import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -33,6 +34,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNAdMobPackage(),
             new RealmReactPackage(),
             new VectorIconsPackage(),
               new BatteryStatusPackage()

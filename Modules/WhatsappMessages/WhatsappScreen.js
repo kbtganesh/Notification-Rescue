@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
 import { Container, Header, Content, Tab, Tabs } from 'native-base';
+import { AdMobBanner } from 'react-native-admob'
 import _ from 'underscore';
 
 import { Icon } from 'native-base';
@@ -71,6 +72,10 @@ class WhatsappScreen extends Component {
   render() {
     const { navigation } = this.props;
     const { singleChat, groupChat } = this.state;
+    let singleChatList = Object.keys(singleChat) || [];
+    let groupChatList = Object.keys(groupChat) || [];
+    singleChatList.insert(singleChatList.length >= 4 ? randomIntFromInterval(2,singleChatList.length) : singleChatList.length, 'kbtganesh-advertisement')
+    groupChatList.insert(singleChatList.length >= 4 ? randomIntFromInterval(2,singleChatList.length) : singleChatList.length, 'kbtganesh-advertisement')
     let headerTitle = navigation.getParam('name');
     return (
       <View style={styles.container}>
@@ -93,13 +98,13 @@ class WhatsappScreen extends Component {
           <Tabs>
             <Tab heading="Groups" tabStyle={styles.tabStyle} textStyle={styles.tabTextStyle} activeTabStyle={styles.activeTabStyle}>
               <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
-                {Object.keys(groupChat).map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
+                {groupChatList.map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
                   onPress={() => { this.onPressChatTitle(item, 'group') }} chatTitle={item} packageName={item.packageName} />)}
               </ScrollView>
             </Tab>
             <Tab heading="Contacts" tabStyle={styles.tabStyle} textStyle={styles.tabTextStyle} activeTabStyle={styles.activeTabStyle}>
               <ScrollView contentContainerStyle={{ justifyContent: 'flex-start' }} style={styles.bodyView}>
-                {Object.keys(singleChat).map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
+                {singleChatList.map((item, i) => <AppBox key={`whatsapp-name-box-${i}`}
                   onPress={() => { this.onPressChatTitle(item, 'single') }} chatTitle={item} packageName={item.packageName} />)}
               </ScrollView>
             </Tab>
@@ -112,16 +117,27 @@ class WhatsappScreen extends Component {
 
 const AppBox = (props) => {
   console.log('props: ', props);
-  let chatTitleWithoutEmojies = props.chatTitle.replace(/([\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2694-\u2697]|\uD83E[\uDD10-\uDD5D])/g, '')
-  let firstLetter = (chatTitleWithoutEmojies.match(/[a-zA-Z0-9]/) || []).pop() || chatTitleWithoutEmojies[0];
-  return (
-    <TouchableOpacity style={styles.appBox} onPress={props.onPress}>
-      <View style={styles.letterIcon}>
-        <Text style={styles.letterIconText}>{firstLetter}</Text>
-      </View>
-      <Text style={styles.chatTitle}>{props.chatTitle}</Text>
-    </TouchableOpacity>
-  )
+  const { chatTitle } = props;
+  if(chatTitle === 'kbtganesh-advertisement'){
+    return (
+      <AdMobBanner
+        adSize="fullBanner"
+        adUnitID="ca-app-pub-4058004042775880/7760195164"
+        onAdFailedToLoad={error => console.error(error)}
+      />
+    )
+  }else{
+    let chatTitleWithoutEmojies = chatTitle.replace(/([\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2694-\u2697]|\uD83E[\uDD10-\uDD5D])/g, '');
+    let firstLetter = (chatTitleWithoutEmojies.match(/[a-zA-Z0-9]/) || []).pop() || chatTitleWithoutEmojies[0];
+      return (
+        <TouchableOpacity style={styles.appBox} onPress={props.onPress}>
+          <View style={styles.letterIcon}>
+            <Text style={styles.letterIconText}>{firstLetter}</Text>
+          </View>
+          <Text style={styles.chatTitle}>{chatTitle}</Text>
+        </TouchableOpacity>
+      )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -164,7 +180,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     // borderBottomWidth: 1,
-    // borderBottomColor: COLOR.LIGHT_GRAY,
+    // backgroundColor: COLOR.LIGHT_GRAY,
   },
   letterIcon: {
     display: 'flex',
@@ -194,6 +210,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR.WHATSAPP_DARK
   }
 });
+
+function randomIntFromInterval(min,max) // min and max included
+{
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+Array.prototype.insert = function ( index, item ) {
+  this.splice( index, 0, item );
+};
 
 export default WhatsappScreen;
 
