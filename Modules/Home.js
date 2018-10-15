@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { NativeModules, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { AdMobBanner } from 'react-native-admob'
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 import { Icon } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
@@ -23,8 +25,11 @@ class Home extends Component {
     this.state = {
       storedList: [],
       notificationsList: null,
+      showAlert: false,
     };
     this.callback = this.callback.bind(this);
+    this.showAlert = this.showAlert.bind(this);
+    this.hideAlert = this.hideAlert.bind(this);
     this.onNotificationPosted = this.onNotificationPosted.bind(this);
 
   }
@@ -78,11 +83,23 @@ class Home extends Component {
   }
 
   callback(isNotificationEnabled) {
-    if (!isNotificationEnabled)
-      NativeModules.BatteryStatus.requestForNotificationAccess();
+    if (!isNotificationEnabled){
+      this.showAlert();
+    }else if(isNotificationEnabled && this.state && this.state.showAlert){
+      this.hideAlert();
+    }
   }
 
+  hideAlert() {
+    this.setState({ showAlert: false });
+  }
+  
+  showAlert() {
+    this.setState({ showAlert: true });
+  }
+  
   render() {
+    const { showAlert } = this.state;
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
@@ -94,13 +111,28 @@ class Home extends Component {
         </View>
         <View style={styles.bodyView}>
           <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'space-around' }} style={{ width: '100%', padding: 30 }}>
-            <Box type='ALL' navigate={navigate} />
-            <Box type='APP' navigate={navigate}/>
-            <Box type='WHATSAPP' navigate={navigate}/>
-            <Box type='OTHER' navigate={navigate}/>
+            <Box type='ALL' navigate={navigate} showAlert={this.showAlert}/>
+            <Box type='APP' navigate={navigate} showAlert={this.showAlert}/>
+            <Box type='WHATSAPP' navigate={navigate} showAlert={this.showAlert}/>
+            <Box type='OTHER' navigate={navigate} showAlert={this.showAlert}/>
           </ScrollView>
         </View>
 
+        <AwesomeAlert
+            show={showAlert}
+            showProgress={false}
+            title="Notification Request"
+            message="Please enable the notification access for 'Rescue Notification' application in following screen."
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showConfirmButton={true}
+            confirmText="Go to settings"
+            confirmButtonColor={COLOR.PRIMARY}
+            onConfirmPressed={() => {
+              NativeModules.BatteryStatus.requestForNotificationAccess();
+              this.hideAlert();
+            }}
+          />
       </View>
     );
   }
@@ -126,9 +158,14 @@ class Box extends Component {
           <Text style={styles.boxTopTitle}>{BOX_TITLE[props.type]}</Text>
           <Text style={styles.boxTopDesc}>{BOX_DESC[props.type]}</Text>
         </View>
-        <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() =>
+        <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() => {
+          NativeModules.BatteryStatus.isNotificationEnabled((isNotificationEnabled) => {
+            if(isNotificationEnabled)
               navigate(props.type, { name: BOX_TITLE[props.type] })
-            }>
+            else
+              props.showAlert();
+          });
+        }}>
             {props.type !== 'OTHER' ? <Text style={styles.boxBottomText}>OPEN</Text> : <AdMobBanner
               adSize="fullBanner"
               adUnitID="ca-app-pub-4058004042775880/8130239563"
