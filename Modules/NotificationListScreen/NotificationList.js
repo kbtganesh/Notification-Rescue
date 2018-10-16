@@ -136,7 +136,7 @@ class NotificationList extends Component {
   }
 
   render() {
-    const { notificationsList, selectedDate, notificationObject, flatListMargin } = this.state;
+    const { notificationsList, selectedDate, infoMargin, flatListMargin } = this.state;
     const { navigation } = this.props;
     let headerTitle = navigation.getParam('name');
 

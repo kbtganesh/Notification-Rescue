@@ -51,9 +51,20 @@ class WhatsappScreen extends Component {
             <Icon type="FontAwesome" name="refresh" style={{ fontSize: 24, color: 'white' }} />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-end' }} style={styles.bodyView}>
+        <FlatList
+          ref={ref => this.flatList = ref}
+          style={{ ...styles.bodyView }}
+          data={chatList.sort((a,b) => (new Date(a.createdAt) - new Date(b.createdAt)))}
+          keyExtractor={(item, index) => (index + '')}
+          onContentSizeChange={() => this.flatList.scrollToEnd({animated: true})}
+          onLayout={() => this.flatList.scrollToEnd({animated: true})}
+          renderItem={({ item, index }) => {
+            return (<AppBox key={`whatsapp-chat-box-${index}`} lastItem={chatList.length === index+1} onPress={this.onPressApplication} text={item.text} personName = {item.personName} createdAt={item.createdAt} />)
+          }}
+        />
+        {/* <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'flex-end' }} style={styles.bodyView}>
           {chatList.reverse().map((item, i) => <AppBox key={`whatsapp-chat-box-${i}`} onPress={this.onPressApplication} text={item.text} personName = {item.personName} createdAt={item.createdAt} />)}
-        </ScrollView>
+        </ScrollView> */}
       </View>
     )
   }
@@ -63,8 +74,10 @@ const AppBox = (props) => {
   console.log('props: ', props);
   let sameDay = moment(props.createdAt).isSame(new Date(), 'days');
   let time = sameDay ? moment(props.createdAt).format('LT') : moment(props.createdAt).format('lll');
+  let lastItemStyle = props.lastItem ? {marginBottom: 30} : {};
+  console.log('props.lastItem: ', props.lastItem);
   return (
-    <TouchableOpacity style={styles.appBox} onPress={() => props.onPress(props.packageName, props.appName)}>
+    <TouchableOpacity style={{...styles.appBox, ...lastItemStyle}} onPress={() => props.onPress(props.packageName, props.appName)}>
     <View style={styles.chatBubble}>
       {props.personName && <Text style={styles.personName}>{props.personName}</Text>}
       <Text style={styles.textMessage}>{props.text}</Text>

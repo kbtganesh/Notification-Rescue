@@ -32,12 +32,21 @@ class WhatsappScreen extends Component {
     let singleChat = {};
     let groupChat = {};
     notificationsList.forEach(item => {
-      console.log('item.title: ', item.title);
-      let [chatTitle, personName] = item.title.split(":");
-      chatTitle = chatTitle.trim();
-      personName = personName ? personName.trim() : '';
-      if (chatTitle.includes('messages)')) {
-        chatTitle = chatTitle.slice(0, chatTitle.lastIndexOf('(')).trim();
+      let chatTitle, personName;
+      if(item.title.includes('@')){
+        [personName, chatTitle] = item.title.split("@");
+        chatTitle = chatTitle.trim();
+        personName = personName ? personName.trim() : '';
+        if (chatTitle.includes('messages)')) {
+          chatTitle = chatTitle.slice(0, chatTitle.lastIndexOf('(')).trim();
+        }
+      }else{
+        [chatTitle, personName] = item.title.split(":");
+        chatTitle = chatTitle.trim();
+        personName = personName ? personName.trim() : '';
+        if (chatTitle.includes('messages)')) {
+          chatTitle = chatTitle.slice(0, chatTitle.lastIndexOf('(')).trim();
+        }
       }
       if (personName.match(".*[a-zA-Z0-9]+.*")) {
         item.personName = personName;
@@ -72,8 +81,9 @@ class WhatsappScreen extends Component {
   render() {
     const { navigation } = this.props;
     const { singleChat, groupChat } = this.state;
-    let singleChatList = Object.keys(singleChat) || [];
     let groupChatList = Object.keys(groupChat) || [];
+    let singleChatList = Object.keys(singleChat) || [];
+    singleChatList = singleChatList.filter(item => !groupChatList.includes(item));
     singleChatList.insert(singleChatList.length >= 4 ? randomIntFromInterval(2,singleChatList.length) : singleChatList.length, 'kbtganesh-advertisement')
     groupChatList.insert(singleChatList.length >= 4 ? randomIntFromInterval(2,singleChatList.length) : singleChatList.length, 'kbtganesh-advertisement')
     let headerTitle = navigation.getParam('name');
