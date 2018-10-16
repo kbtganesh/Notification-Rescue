@@ -51,10 +51,10 @@ class NotificationDetail extends Component {
 
 const Row = (props) => {
 
-  let valueUI = typeof props.value === 'string' ? <Text style={styles.rowValue}>{props.value}</Text> : <View style={styles.rowValue}>{props.value.map(item => <Text>{item}</Text>)}</View>;
+  let valueUI = typeof props.value === 'string' ? <Text selectable style={styles.rowValue}>{props.value}</Text> : <View style={styles.rowValue}>{props.value.map(item => <Text selectable>{item}</Text>)}</View>;
   return(
     <View style={styles.rowView}>
-      <Text style={styles.rowTitle}>{props.title} : </Text>
+      <Text selectable style={styles.rowTitle}>{props.title} : </Text>
       {valueUI}
     </View>
   )

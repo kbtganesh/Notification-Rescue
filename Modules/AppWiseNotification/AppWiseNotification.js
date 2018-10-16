@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     zIndex: 100,
+    elevation: 10,
     // textAlign: 'center',
     justifyContent: 'space-between',
     padding: 15,

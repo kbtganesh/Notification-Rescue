@@ -48,7 +48,7 @@ class WhatsappScreen extends Component {
               // NotificationService.deleteAll();
               // this.datePicker();
             }}>
-            <Icon type="FontAwesome" name="refresh" style={{ fontSize: 24, color: 'white' }} />
+            {/* <Icon type="FontAwesome" name="refresh" style={{ fontSize: 24, color: 'white' }} /> */}
           </TouchableOpacity>
         </View>
         <FlatList
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     zIndex: 100,
+    elevation: 10,
     // textAlign: 'center',
     justifyContent: 'space-between',
     padding: 15,

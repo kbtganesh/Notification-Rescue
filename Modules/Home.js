@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeModules, StyleSheet, Text, Image, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { AdMobBanner } from 'react-native-admob'
 import AwesomeAlert from 'react-native-awesome-alerts';
 
@@ -8,12 +8,13 @@ import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
 
 
-const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Other' }
+const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Support', 'CONTACT': 'Contact' }
 const BOX_DESC = {
   'ALL': 'Find all the notifications received in your mobile',
   'APP': 'Get the categorized list of notifications based on application',
   'WHATSAPP': 'Read your whastapp chats including the deleted messages',
-  'OTHER': 'Cras quis felis vel metus lobortis porta a ut ligula'
+  'OTHER': 'Support the developer by checking out the Ads you find in this application',
+  'CONTACT': 'Incase if you want to email the developer, feel free to share your comments'
 }
 class Home extends Component {
   static navigationOptions = {
@@ -106,7 +107,7 @@ class Home extends Component {
         <View style={styles.headerView}>
           <View style={styles.headerTop}>
             <Icon type="FontAwesome" name="bell" style={{ fontSize: 24, color: 'white' }} />
-            <Text style={styles.headerText}>Notification Rescue</Text>
+            <Text style={styles.headerText}>Rescue Notifications</Text>
           </View>
         </View>
         <View style={styles.bodyView}>
@@ -115,6 +116,7 @@ class Home extends Component {
             <Box type='APP' navigate={navigate} showAlert={this.showAlert}/>
             <Box type='WHATSAPP' navigate={navigate} showAlert={this.showAlert}/>
             <Box type='OTHER' navigate={navigate} showAlert={this.showAlert}/>
+            <Box type='CONTACT' navigate={navigate} showAlert={this.showAlert}/>
           </ScrollView>
         </View>
 
@@ -153,20 +155,24 @@ class Box extends Component {
     const { navigate } = props;
     console.log('AdMobBanner.simulatorId', AdMobBanner.simulatorId);
     return (
-      <View style={{ ...styles.box, marginBottom: props.type === 'OTHER' ? 50 : 30 }}>
+      <View style={{ ...styles.box, marginBottom: props.type === 'CONTACT' ? 50 : 30 }}>
         <View style={{ ...styles.boxTop, backgroundColor: COLOR[props.type] }}>
           <Text style={styles.boxTopTitle}>{BOX_TITLE[props.type]}</Text>
           <Text style={styles.boxTopDesc}>{BOX_DESC[props.type]}</Text>
         </View>
         <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() => {
           NativeModules.BatteryStatus.isNotificationEnabled((isNotificationEnabled) => {
-            if(isNotificationEnabled)
-              navigate(props.type, { name: BOX_TITLE[props.type] })
-            else
-              props.showAlert();
+            if(props.type === 'CONTACT'){
+              Linking.openURL('mailto:kbtganesh@gmail.com?subject=RescueNotification-UserComments')
+            }else{
+              if(isNotificationEnabled)
+                navigate(props.type, { name: BOX_TITLE[props.type] })
+              else
+                props.showAlert();
+            }
           });
         }}>
-            {props.type !== 'OTHER' ? <Text style={styles.boxBottomText}>OPEN</Text> : <AdMobBanner
+            {props.type !== 'OTHER' ? <Text style={styles.boxBottomText}>{props.type === 'CONTACT' ? 'EMAIL' : 'OPEN'}</Text> : <AdMobBanner
               adSize="fullBanner"
               adUnitID="ca-app-pub-4058004042775880/8130239563"
               // testDevices={[AdMobBanner.simulatorId]}
@@ -197,7 +203,7 @@ const styles = StyleSheet.create({
   },
   headerTop: {
     display: 'flex',
-    height: '70%',
+    height: '90%',
     textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',
@@ -207,7 +213,8 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
-    fontSize: 18,
+    fontSize: 32,
+    fontFamily: 'sans-serif-light',
     color: COLOR.PRIMARY_TEXT,
   },
   bodyView: {

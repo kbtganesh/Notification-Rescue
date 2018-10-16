@@ -19,6 +19,8 @@ export const COLOR = {
     WHATSAPP_DARK:'#004c40',
     OTHER:'#827717',
     OTHER_DARK:'#524c00',
+    CONTACT:'#4e342e',
+    CONTACT_DARK:'#260e04',
 
     LOVELY_GRAY: '#37474f',
     LIGHT_GRAY: '#9ea7aa',
