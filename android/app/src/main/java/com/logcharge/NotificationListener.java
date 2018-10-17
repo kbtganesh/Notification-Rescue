@@ -48,6 +48,7 @@ public class NotificationListener extends NotificationListenerService {
         Log.d("KBT", "FROM LISTENER onNotificationPosted");
         if(!sbn.isOngoing()){
             String packageName = sbn.getPackageName();
+            String key = sbn.getKey();
             PackageManager packageManager= getApplicationContext().getPackageManager();
             ApplicationInfo ai;
             try {
@@ -64,6 +65,7 @@ public class NotificationListener extends NotificationListenerService {
             }
             Bundle extras = sbn.getNotification().extras;
             extras.putString("ticker", ticker);
+            extras.putString("key", key);
             extras.putString("packageName", packageName);
             extras.putString("appName", appName);
             extras.putString("timeStamp", Long.toString(notification.when));

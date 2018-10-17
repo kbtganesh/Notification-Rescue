@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
-import { Container, Header, Content, Tab, Tabs } from 'native-base';
+import { Container, Header, Icon, Tab, Tabs } from 'native-base';
 import { AdMobBanner } from 'react-native-admob'
 import _ from 'underscore';
 
-import { Icon } from 'native-base';
 import { COLOR } from '../../Constants/Design';
 import NotificationService from '../../Database/NotificationService';
 
@@ -89,6 +88,7 @@ class WhatsappScreen extends Component {
     let headerTitle = navigation.getParam('name');
     return (
       <View style={styles.container}>
+        <Header androidStatusBarColor={COLOR.WHATSAPP} style={{display:'none'}}/>
         <View style={styles.headerView}>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
             onPress={() =>

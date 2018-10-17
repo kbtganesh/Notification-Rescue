@@ -3,7 +3,7 @@ import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Button, Tou
 import { AdMobBanner } from 'react-native-admob'
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-import { Icon } from 'native-base';
+import { Icon, Header } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
 
@@ -68,16 +68,21 @@ class Home extends Component {
     if(params) {
       params = JSON.parse(params);
       var appName = params['appName']
+      console.log('APPPPP appName: ', appName);
+      var key = params['key']
       var packageName = params['packageName']
       var subText = params['android.subText'];
       var title = params['android.title'];
+      console.log('TITLLEEEE title: ', title);
+      console.log('UNIQUEEEE key: ', key);
       var text = params['android.text'];
       var bigText = params['android.bigText'];
       var summeryText = params['android.summaryText'];
       var textLines = params['android.textLines'] || [];
       var ticker = params['ticker'];
       var createdAt = new Date(parseInt(params['timeStamp']));
-      var notificationObject = {appName, packageName, subText, title, text, bigText, summeryText, createdAt, textLines, ticker};
+      var extra = '';
+      var notificationObject = {appName, key, packageName, subText, title, text, bigText, summeryText, createdAt, textLines, ticker, extra};
       NotificationService.save(notificationObject);
       
     }
@@ -104,6 +109,7 @@ class Home extends Component {
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
+        <Header androidStatusBarColor={COLOR.PRIMARY} style={{display:'none'}}/>
         <View style={styles.headerView}>
           <View style={styles.headerTop}>
             <Icon type="FontAwesome" name="bell" style={{ fontSize: 24, color: 'white' }} />

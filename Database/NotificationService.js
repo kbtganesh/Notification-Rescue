@@ -6,6 +6,7 @@ let repository = new Realm({
     name: 'Notification',
     properties: {
       appName: 'string',
+      key: 'string',
       packageName: 'string',
       title: 'string',
       subText: 'string',
@@ -15,6 +16,7 @@ let repository = new Realm({
       createdAt: 'date',
       ticker: 'string',
       textLines: 'string?[]',
+      extra: 'string'
     }
   }]
 });

@@ -10,10 +10,11 @@ import React, { Component } from 'react';
 import { DatePickerAndroid, StyleSheet, Text, View, ScrollView, TouchableOpacity, Animated, DeviceEventEmitter, AsyncStorage } from 'react-native';
 import moment from 'moment';
 
-import { Icon } from 'native-base';
+import { Icon, Header } from 'native-base';
 import { COLOR } from '../../Constants/Design';
 import NotificationListRow from './NotificationListRow';
 import NotificationService from '../../Database/NotificationService';
+import EmptyPage from '../../Components/EmptyPage';
 
 // import {Container, Header, Left, Right, Body, Button, Title, Icon, Content} from 'native-base';
 const HEADER_HEIGHT = 64;
@@ -71,9 +72,7 @@ class NotificationList extends Component {
     }else{
       notificationsList = NotificationService.getAll();
     }
-    console.log('ARRRRRRRRRRRRRAY', JSON.stringify(notificationsList.map(item => item)));
     this.setState({ notificationsList: notificationsList || [], filterByApp: filterByApp || '' });
-    console.log('last 10', notificationsList.slice(0,10));
     NotificationService.registerListener(this.notificationListenerCallback);
   }
   
@@ -141,7 +140,6 @@ class NotificationList extends Component {
     let headerTitle = navigation.getParam('name');
 
 
-    console.log('notificationsList.length: ', notificationsList.length);
     const infoViewUI = selectedDate ? (<Animated.View style={{ ...styles.infoView, marginTop: infoMargin }}>
       <TouchableOpacity style={styles.infoTextLayer} title="OPEN"
         onPress={() => {
@@ -158,7 +156,7 @@ class NotificationList extends Component {
     </Animated.View>) : null;
     return (
       <View style={styles.container}>
-
+        <Header androidStatusBarColor={COLOR.PRIMARY} style={{display:'none'}}/>
         <View style={styles.headerView}>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
             onPress={() =>
@@ -176,6 +174,8 @@ class NotificationList extends Component {
           </TouchableOpacity>
         </View>
         {infoViewUI}
+        {notificationsList.length > 0 
+        ? 
         <Animated.FlatList
           style={{ ...styles.bodyView, marginTop: selectedDate ? 0 : HEADER_HEIGHT }}
           data={notificationsList}
@@ -184,6 +184,9 @@ class NotificationList extends Component {
             return (<NotificationListRow item={item} onPress={()=>this.onNotificationPress(item)}/>)
           }}
         />
+        :
+        <EmptyPage style={styles.bodyView}/>
+        }
         
       </View>
     );

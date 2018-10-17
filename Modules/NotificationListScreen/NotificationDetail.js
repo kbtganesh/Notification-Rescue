@@ -17,7 +17,6 @@ class NotificationDetail extends Component {
     const { navigation } = this.props;
     let headerTitle = navigation.getParam('name');
     let notificationObject = navigation.getParam('notificationObject');
-    console.log('notificationObject: ', notificationObject);
 
     return ( <View style={styles.container}>
         <View style={styles.headerView}>

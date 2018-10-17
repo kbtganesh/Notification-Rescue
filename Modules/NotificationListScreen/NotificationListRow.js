@@ -29,7 +29,7 @@ class NotificationListRow extends Component {
         <Text style={styles.textTitle}>{item.title}</Text>
         <Text style={styles.textDate}>{moment(item.createdAt).format('LT')}</Text>
       </View>
-      <Text style={styles.textContent}>{item.text}</Text>
+      <Text style={styles.textContent}>{item.text || item.ticker}</Text>
       </React.Fragment>
     </TouchableHighlight> );
   }

@@ -71,7 +71,7 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void requestForNotificationAccess() {
-        Toast.makeText(getReactApplicationContext(), "Give me the fking notification access", Toast.LENGTH_LONG).show();
+        Toast.makeText(getReactApplicationContext(), "Find 'Rescue Notification' in this list and Enable it.", Toast.LENGTH_LONG).show();
         getReactApplicationContext().startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
     }
 

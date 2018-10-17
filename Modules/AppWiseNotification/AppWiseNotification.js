@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, StyleSheet, Text, View, Dimensions, TouchableOpacity, NativeModules, Image, AsyncStorage } from 'react-native';
 import _ from 'underscore';
 
-import { Icon } from 'native-base';
+import { Icon, Header } from 'native-base';
 import { COLOR } from '../../Constants/Design';
 import Loader from '../../Components/Loader'
 import NotificationService from '../../Database/NotificationService';
@@ -52,6 +52,7 @@ class AppWiseNotification extends Component {
     let headerTitle = navigation.getParam('name');
     return (
       <View style={styles.container}>
+        <Header androidStatusBarColor={COLOR.PRIMARY} style={{display:'none'}}/>
         <Loader loading={loading} />
         <View style={styles.headerView}>
           <TouchableOpacity style={styles.boxBottomText} title="OPEN"
@@ -66,7 +67,7 @@ class AppWiseNotification extends Component {
               // NotificationService.deleteAll();
               // this.datePicker();
             }}>
-            <Icon type="FontAwesome" name="calendar" style={{ fontSize: 24, color: 'white' }} />
+            {/* <Icon type="FontAwesome" name="calendar" style={{ fontSize: 24, color: 'white' }} /> */}
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }} style={styles.bodyView}>
