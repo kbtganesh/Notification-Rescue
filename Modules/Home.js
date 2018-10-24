@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { AdMobBanner } from 'react-native-admob'
 import AwesomeAlert from 'react-native-awesome-alerts';
+import DeviceInfo from 'react-native-device-info';
 
 import { Icon, Header } from 'native-base';
 import NotificationService from '../Database/NotificationService';
@@ -169,7 +170,21 @@ class Box extends Component {
         <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() => {
           NativeModules.BatteryStatus.isNotificationEnabled((isNotificationEnabled) => {
             if(props.type === 'CONTACT'){
-              let kbt = ``
+              let kbt = `
+
+
+
+
+
+*Device Information*
+  App Version - ${DeviceInfo.getReadableVersion()}
+  Android OS Version - ${DeviceInfo.getSystemVersion()}
+  Has Notch - ${DeviceInfo.hasNotch()}
+  Manufacturer - ${DeviceInfo.getManufacturer()}
+  Model - ${DeviceInfo.getModel()}
+  First Install Time - ${new Date(DeviceInfo.getFirstInstallTime()).toLocaleString()}
+  Device ID - ${DeviceInfo.getUniqueID()}
+  `
               Linking.openURL(`mailto:kbtganesh@gmail.com?subject=RescueNotification-UserComments&body=${kbt}`)
             }else{
               if(isNotificationEnabled)
