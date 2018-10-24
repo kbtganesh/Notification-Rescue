@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Button, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Image, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { AdMobBanner } from 'react-native-admob'
 import AwesomeAlert from 'react-native-awesome-alerts';
 import DeviceInfo from 'react-native-device-info';
@@ -8,7 +8,16 @@ import { Icon, Header } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
 
+const AboutUS = `Hey Guys,
 
+I'm Ganesh babu, Mobile/Web Application Developer from Chennai, Tamilnadu.
+
+You can contact me at kbtganesh@gmail.com.
+`
+
+const Credits = `Icons used in this application are taken from FontAwesome, Entypo
+Pattern Image used in this application is taken from flaticon
+`
 const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Support', 'CONTACT': 'Contact' }
 const BOX_DESC = {
   'ALL': 'Find all the notifications received in your mobile',
@@ -98,23 +107,41 @@ class Home extends Component {
   }
 
   hideAlert() {
-    this.setState({ showAlert: false });
+    this.setState({ showAlert: false, showAboutUs: false, showCredits: false });
   }
   
   showAlert() {
     this.setState({ showAlert: true });
   }
   
+  showAboutUs() {
+    this.setState({ showAboutUs: true });
+  }
+  
   render() {
-    const { showAlert } = this.state;
+    const { showAlert, showAboutUs, showCredits } = this.state;
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
         <Header androidStatusBarColor={COLOR.PRIMARY} style={{display:'none'}}/>
         <View style={styles.headerView}>
+          <Image style={{ ...styles.headerBG }} resizeMode={'cover'} source={require('./Images/pattern.png')}>
+          </Image>
           <View style={styles.headerTop}>
-            <Icon type="FontAwesome" name="bell" style={{ fontSize: 24, color: 'white' }} />
+            <Icon type="FontAwesome" name="bell" style={{ fontSize: 32, color: 'white' }} />
             <Text style={styles.headerText}>Rescue Notifications</Text>
+          </View>
+          <View style={styles.headerBottom}>
+            <TouchableHighlight onPress={()=>{
+              this.setState({ showAboutUs: true });
+            }}>
+              <Icon type="Entypo" name="info-with-circle" style={{ fontSize: 18, color: 'white' }} />
+            </TouchableHighlight>
+            <TouchableHighlight style={{marginLeft: 24}} onPress={()=>{
+              this.setState({ showCredits: true });
+            }}>
+              <Icon type="Entypo" name="text-document-inverted" style={{ fontSize: 18, color: 'white' }} />
+            </TouchableHighlight>
           </View>
         </View>
         <View style={styles.bodyView}>
@@ -127,6 +154,34 @@ class Home extends Component {
           </ScrollView>
         </View>
 
+        <AwesomeAlert
+            show={showCredits}
+            showProgress={false}
+            title="Credits"
+            message={Credits}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showConfirmButton={true}
+            confirmText="Close"
+            confirmButtonColor={COLOR.PRIMARY}
+            onConfirmPressed={() => {
+              this.hideAlert();
+            }}
+          />
+          <AwesomeAlert
+            show={showAboutUs}
+            showProgress={false}
+            title="About Developer"
+            message={AboutUS}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showConfirmButton={true}
+            confirmText="Close"
+            confirmButtonColor={COLOR.PRIMARY}
+            onConfirmPressed={() => {
+              this.hideAlert();
+            }}
+          />
         <AwesomeAlert
             show={showAlert}
             showProgress={false}
@@ -218,24 +273,36 @@ const styles = StyleSheet.create({
   },
   headerView: {
     flex: 3,
-
+    // position: 'relative',
     elevation: 10,
     width: '100%',
     backgroundColor: COLOR.PRIMARY,
   },
+  headerBG: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    opacity: 0.05,
+  },
   headerTop: {
     display: 'flex',
-    height: '90%',
+    height: '80%',
     textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLOR.PRIMARY,
+    // backgroundColor: COLOR.PRIMARY,
     // borderBottomRightRadius: 100,
     // borderBottomLeftRadius: 100,
   },
-
+  headerBottom: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   headerText: {
     fontSize: 32,
+    marginTop: 20,
     fontFamily: 'sans-serif-light',
     color: COLOR.PRIMARY_TEXT,
   },
