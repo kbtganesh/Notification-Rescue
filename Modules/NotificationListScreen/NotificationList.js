@@ -123,7 +123,7 @@ class NotificationList extends Component {
     Animated.timing(                  // Animate over time
       this.state.infoMargin,            // The animated value to drive
       {
-        toValue: HEADER_HEIGHT - INFO_HEIGHT,                   // Animate to opacity: 1 (opaque)
+        toValue: HEADER_HEIGHT - INFO_HEIGHT - 10,                   // Animate to opacity: 1 (opaque)
         duration: 100,              // Make it take a while
       }
     ).start(() => this.setState({ selectedDate: '' }, ()=>{this.setState({ notificationsList: this.getNotifications() })}));
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     zIndex: 100,
-    // textAlign: 'center',
+    elevation: 10,
     justifyContent: 'space-between',
     padding: 15,
     alignItems: 'center',

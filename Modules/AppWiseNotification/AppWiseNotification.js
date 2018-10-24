@@ -6,6 +6,7 @@ import { Icon, Header } from 'native-base';
 import { COLOR } from '../../Constants/Design';
 import Loader from '../../Components/Loader'
 import NotificationService from '../../Database/NotificationService';
+import EmptyPage from '../../Components/EmptyPage';
 
 
 const HEADER_HEIGHT = 64;
@@ -70,9 +71,14 @@ class AppWiseNotification extends Component {
             {/* <Icon type="FontAwesome" name="calendar" style={{ fontSize: 24, color: 'white' }} /> */}
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }} style={styles.bodyView}>
-          {this.state.applicationsList.map((item, i) => <AppBox key={`app-box-${i}`} onPress={this.onPressApplication} appName={item.appName} packageName={item.packageName} appIcon={appIcons[item.packageName]} />)}
-        </ScrollView>
+        {this.state.applicationsList.length > 0
+          ?
+          <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }} style={styles.bodyView}>
+            {this.state.applicationsList.map((item, i) => <AppBox key={`app-box-${i}`} onPress={this.onPressApplication} appName={item.appName} packageName={item.packageName} appIcon={appIcons[item.packageName]} />)}
+          </ScrollView>
+          :
+          <EmptyPage style={styles.bodyView} textStyle={styles.emptyViewText}/>
+        }
       </View>
     )
   }
@@ -190,7 +196,9 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center'
   },
-
+  emptyViewText: {
+    color: COLOR.SECONDARY_TEXT,
+  }
 });
 
 export default AppWiseNotification;

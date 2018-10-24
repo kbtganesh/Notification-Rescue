@@ -11,9 +11,11 @@ class EmptyPage extends Component {
   }
   render() {
     const style = this.props.style || {}
+    const textStyle = this.props.textStyle || {}
     return (
       <View style={{...styles.emptyPageContainer, ...style}}>
-        <Text style={styles.informationText}>Oh..! It's Empty</Text>
+        <Text style={{...styles.informationText, ...textStyle}}>We haven't received any notifications yet.</Text>
+        <Text style={{...styles.subText}}>Please contact us if you find any problem in receiving notifications.</Text>
       </View>
     );
   }
@@ -28,7 +30,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   informationText: {
+    fontSize: 18,
     color: COLOR.PRIMARY_TEXT
+  },
+  subText: {
+    fontSize: 12,
+    color: COLOR.LIGHT_GRAY,
   }
 });
 

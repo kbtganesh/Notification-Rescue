@@ -4,12 +4,12 @@ export const COLOR = {
     PRIMARY_DARK:'#81d4fa',
     PRIMARY_LIGHT:'#b3e5fc',
 
-    SECONDARY:'#ffe082',
+    SECONDARY:'#ffffb3',
     SECONDARY_DARK:'#caae53',
     SECONDARY_LIGHT:'#ffffb3',
 
     PRIMARY_TEXT:'#fafafa',
-    SECONDARY_TEXT:'#000000',
+    SECONDARY_TEXT:'#37474f',
 
     ALL:'#7e57c2',
     ALL_DARK:'#4d2c91',

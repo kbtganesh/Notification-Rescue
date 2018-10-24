@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     zIndex: 100,
-    // textAlign: 'center',
+    elevation: 10,
     justifyContent: 'space-between',
     padding: 15,
     alignItems: 'center',

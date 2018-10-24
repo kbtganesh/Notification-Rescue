@@ -169,7 +169,8 @@ class Box extends Component {
         <TouchableHighlight style={{ ...styles.boxBottom, backgroundColor: COLOR[BottomColor] }} onPress={() => {
           NativeModules.BatteryStatus.isNotificationEnabled((isNotificationEnabled) => {
             if(props.type === 'CONTACT'){
-              Linking.openURL('mailto:kbtganesh@gmail.com?subject=RescueNotification-UserComments')
+              let kbt = ``
+              Linking.openURL(`mailto:kbtganesh@gmail.com?subject=RescueNotification-UserComments&body=${kbt}`)
             }else{
               if(isNotificationEnabled)
                 navigate(props.type, { name: BOX_TITLE[props.type] })
