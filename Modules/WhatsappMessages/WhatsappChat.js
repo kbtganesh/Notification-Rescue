@@ -54,10 +54,11 @@ class WhatsappScreen extends Component {
         <FlatList
           ref={ref => this.flatList = ref}
           style={{ ...styles.bodyView }}
-          data={chatList.sort((a,b) => (new Date(a.createdAt) - new Date(b.createdAt)))}
+          data={chatList.sort((b,a) => (new Date(a.createdAt) - new Date(b.createdAt)))}
+          inverted
           keyExtractor={(item, index) => (index + '')}
-          onContentSizeChange={() => this.flatList.scrollToEnd({animated: true})}
-          onLayout={() => this.flatList.scrollToEnd({animated: true})}
+          // onContentSizeChange={() => this.flatList.scrollToEnd({animated: true})}
+          // onLayout={() => this.flatList.scrollToEnd({animated: true})}
           renderItem={({ item, index }) => {
             return (<AppBox key={`whatsapp-chat-box-${index}`} lastItem={chatList.length === index+1} onPress={this.onPressApplication} text={item.text} personName = {item.personName} createdAt={item.createdAt} />)
           }}

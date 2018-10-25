@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Image, TouchableOpacity, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
+import { NativeModules, StyleSheet, Text, Linking, View, ScrollView, Image, Animated, TouchableHighlight, AsyncStorage, DeviceEventEmitter } from 'react-native';
 import { AdMobBanner } from 'react-native-admob'
 import AwesomeAlert from 'react-native-awesome-alerts';
 import DeviceInfo from 'react-native-device-info';
@@ -10,12 +10,17 @@ import { COLOR } from '../Constants/Design';
 
 const AboutUS = `Hey Guys,
 
-I'm Ganesh babu, Mobile/Web Application Developer from Chennai, Tamilnadu.
+Thank you for trying out my application and supporting me. 
+
+I'm Ganesh babu, Mobile/Web Application Developer. This is my first application in Android.
+
+I am a solo Developer and I do not own a company. I've tried to do my best in this application. You can help me improve by sending me your suggestions via email. If you like this application, don't forget to give rating in playstore and share it with your friends who you might think wants to Rescue their notifications too. ;)
+
 
 You can contact me at kbtganesh@gmail.com.
 `
 
-const Credits = `Icons used in this application are taken from FontAwesome, Entypo
+const Credits = `Icons used in this application are taken from FontAwesome, Entypo, MaterialIcons
 Pattern Image used in this application is taken from flaticon
 `
 const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Support', 'CONTACT': 'Contact' }
@@ -37,11 +42,13 @@ class Home extends Component {
       storedList: [],
       notificationsList: null,
       showAlert: false,
+      rotateValue: new Animated.Value(0),
     };
     this.callback = this.callback.bind(this);
     this.showAlert = this.showAlert.bind(this);
     this.hideAlert = this.hideAlert.bind(this);
     this.onNotificationPosted = this.onNotificationPosted.bind(this);
+    this.sendEmail = this.sendEmail.bind(this);
 
   }
 
@@ -117,9 +124,43 @@ class Home extends Component {
   showAboutUs() {
     this.setState({ showAboutUs: true });
   }
+
+  sendEmail() {
+    this.scrollView.scrollToEnd({animated: true});
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.rotateValue, {
+          toValue: 1,
+          duration: 50,
+          delay: 0
+        }),
+        Animated.timing(this.state.rotateValue, {
+          toValue: -1,
+          duration: 50
+        }),
+        Animated.timing(this.state.rotateValue, {
+          toValue: 0,
+          duration: 50,
+          delay: 0
+        })
+      ]),
+      {
+        iterations: 4
+      }
+    ).start(() => {
+      Animated.timing(this.state.rotateValue, {
+        toValue: 0,
+        duration: 500
+      }).start();
+    })
+  }
   
   render() {
-    const { showAlert, showAboutUs, showCredits } = this.state;
+    const { showAlert, showAboutUs, showCredits, rotateValue } = this.state;
+    const spin = rotateValue.interpolate({
+      inputRange: [-1, 1],
+      outputRange: ['-3deg', '3deg']
+    })
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
@@ -135,22 +176,27 @@ class Home extends Component {
             <TouchableHighlight onPress={()=>{
               this.setState({ showAboutUs: true });
             }}>
-              <Icon type="Entypo" name="info-with-circle" style={{ fontSize: 18, color: 'white' }} />
+              <Icon type="FontAwesome" name="user" style={{ fontSize: 20, color: 'white' }} />
             </TouchableHighlight>
             <TouchableHighlight style={{marginLeft: 24}} onPress={()=>{
               this.setState({ showCredits: true });
             }}>
-              <Icon type="Entypo" name="text-document-inverted" style={{ fontSize: 18, color: 'white' }} />
+              <Icon type="Entypo" name="info-with-circle" style={{ fontSize: 20, color: 'white' }} />
+            </TouchableHighlight>
+            <TouchableHighlight style={{marginLeft: 24}} onPress={()=>{
+              this.sendEmail();
+            }}>
+              <Icon type="MaterialIcons" name="email" style={{ fontSize: 20, color: 'white' }} />
             </TouchableHighlight>
           </View>
         </View>
         <View style={styles.bodyView}>
-          <ScrollView contentContainerStyle={{ display: 'flex', justifyContent: 'space-around' }} style={{ width: '100%', padding: 30 }}>
+          <ScrollView ref={ref => this.scrollView = ref} contentContainerStyle={{ display: 'flex', justifyContent: 'space-around' }} style={{ width: '100%', padding: 30 }}>
             <Box type='ALL' navigate={navigate} showAlert={this.showAlert}/>
             <Box type='APP' navigate={navigate} showAlert={this.showAlert}/>
             <Box type='WHATSAPP' navigate={navigate} showAlert={this.showAlert}/>
             <Box type='OTHER' navigate={navigate} showAlert={this.showAlert}/>
-            <Box type='CONTACT' navigate={navigate} showAlert={this.showAlert}/>
+            <Box type='CONTACT' navigate={navigate} showAlert={this.showAlert} spin={spin}/>
           </ScrollView>
         </View>
 
@@ -169,12 +215,13 @@ class Home extends Component {
             }}
           />
           <AwesomeAlert
+            styles={{zIndex: 10000, backgroundColor: 'red'}}
             show={showAboutUs}
             showProgress={false}
             title="About Developer"
             message={AboutUS}
-            closeOnTouchOutside={false}
-            closeOnHardwareBackPress={false}
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={true}
             showConfirmButton={true}
             confirmText="Close"
             confirmButtonColor={COLOR.PRIMARY}
@@ -214,10 +261,16 @@ class Box extends Component {
   render() {
     let props = this.props;
     let BottomColor = props.type + '_DARK';
-    const { navigate } = props;
+    const { navigate, spin } = props;
     console.log('AdMobBanner.simulatorId', AdMobBanner.simulatorId);
+    let KBTView = View;
+    let spinStyle = {};
+    if(spin) {
+      KBTView = Animated.View;
+      spinStyle = { transform: [{rotate: spin}] };
+    }
     return (
-      <View style={{ ...styles.box, marginBottom: props.type === 'CONTACT' ? 50 : 30 }}>
+      <KBTView style={{ ...styles.box, ...spinStyle, marginBottom: props.type === 'CONTACT' ? 50 : 30 }}>
         <View style={{ ...styles.boxTop, backgroundColor: COLOR[props.type] }}>
           <Text style={styles.boxTopTitle}>{BOX_TITLE[props.type]}</Text>
           <Text style={styles.boxTopDesc}>{BOX_DESC[props.type]}</Text>
@@ -256,7 +309,7 @@ class Box extends Component {
               onAdFailedToLoad={error => console.warn(error)}
             />}
         </TouchableHighlight>
-      </View>
+      </KBTView>
     )
   }
 }
@@ -274,7 +327,7 @@ const styles = StyleSheet.create({
   headerView: {
     flex: 3,
     // position: 'relative',
-    elevation: 10,
+    // elevation: 10,
     width: '100%',
     backgroundColor: COLOR.PRIMARY,
   },
@@ -316,6 +369,7 @@ const styles = StyleSheet.create({
   box: {
     width: '100%',
     height: 150,
+    elevation: 2,
     marginBottom: 30,
     borderRadius: 20,
     backgroundColor: 'white'
