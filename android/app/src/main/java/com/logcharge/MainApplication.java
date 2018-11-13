@@ -58,6 +58,16 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    // Intent intent = new Intent("NOTIFICATION_POSTED_KBT");
+    
+//    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+//                                          intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//    Calendar calendar = Calendar.getInstance();
+//    calendar.setTimeInMillis(System.currentTimeMillis());
+//    calendar.add(Calendar.MINUTE, 1);
+//
+//    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60, pendingIntent);
     Log.d("KBT","MainApplication Oncreate");
 //    Intent notificationIntent = new Intent(getApplicationContext(), NotificationListener.class);
 //    startService(notificationIntent);

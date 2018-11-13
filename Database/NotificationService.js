@@ -48,8 +48,7 @@ let NotificationService = {
   save: function (notification) {
     console.log('save notification: ', notification);
     let textualMatch = repository.objects('Notification').filtered("text = $0 && createdAt = $1", notification.text, notification.createdAt).length;
-    let keylMatch = repository.objects('Notification').filtered("key = $0", notification.key).length;
-    if (textualMatch || keylMatch){
+    if (textualMatch){
      console.log('Returning notification ', notification);
      return; 
     }

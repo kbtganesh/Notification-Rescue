@@ -8,7 +8,7 @@ import { Icon, Header } from 'native-base';
 import NotificationService from '../Database/NotificationService';
 import { COLOR } from '../Constants/Design';
 
-const AboutUS = `Hey Guys,
+const AboutDev = `Hey Guys,
 
 Thank you for trying out my application and supporting me. 
 
@@ -20,7 +20,7 @@ I am a solo Developer and I do not own a company. I've tried to do my best in th
 You can contact me at kbtganesh@gmail.com.
 `
 
-const Credits = `Icons used in this application are taken from FontAwesome, Entypo, MaterialIcons
+const AboutUs = `Icons used in this application are taken from FontAwesome, Entypo, MaterialIcons
 Pattern Image used in this application is taken from flaticon
 `
 const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Support', 'CONTACT': 'Contact' }
@@ -54,13 +54,7 @@ class Home extends Component {
 
   componentDidMount() {
     NativeModules.BatteryStatus.isNotificationEnabled(this.callback);
-    AsyncStorage.getItem('RegisterNotification').then(value => {
-      if (!value) {
-        NativeModules.BatteryStatus.registerNotificationListener();
-        AsyncStorage.setItem('RegisterNotification', true);
-        ;
-      }
-    });
+    NativeModules.BatteryStatus.registerNotificationListener();
     DeviceEventEmitter.addListener('onNotificationPosted', this.onNotificationPosted);
 
 
@@ -85,13 +79,10 @@ class Home extends Component {
     if(params) {
       params = JSON.parse(params);
       var appName = params['appName']
-      console.log('APPPPP appName: ', appName);
       var key = params['key']
       var packageName = params['packageName']
       var subText = params['android.subText'];
       var title = params['android.title'];
-      console.log('TITLLEEEE title: ', title);
-      console.log('UNIQUEEEE key: ', key);
       var text = params['android.text'];
       var bigText = params['android.bigText'];
       var summeryText = params['android.summaryText'];
@@ -114,15 +105,15 @@ class Home extends Component {
   }
 
   hideAlert() {
-    this.setState({ showAlert: false, showAboutUs: false, showCredits: false });
+    this.setState({ showAlert: false, showAboutDev: false, showAboutUs: false });
   }
   
   showAlert() {
     this.setState({ showAlert: true });
   }
   
-  showAboutUs() {
-    this.setState({ showAboutUs: true });
+  showAboutDev() {
+    this.setState({ showAboutDev: true });
   }
 
   sendEmail() {
@@ -156,7 +147,7 @@ class Home extends Component {
   }
   
   render() {
-    const { showAlert, showAboutUs, showCredits, rotateValue } = this.state;
+    const { showAlert, showAboutDev, showAboutUs, rotateValue } = this.state;
     const spin = rotateValue.interpolate({
       inputRange: [-1, 1],
       outputRange: ['-3deg', '3deg']
@@ -174,12 +165,12 @@ class Home extends Component {
           </View>
           <View style={styles.headerBottom}>
             <TouchableHighlight onPress={()=>{
-              this.setState({ showAboutUs: true });
+              this.setState({ showAboutDev: true });
             }}>
               <Icon type="FontAwesome" name="user" style={{ fontSize: 20, color: 'white' }} />
             </TouchableHighlight>
             <TouchableHighlight style={{marginLeft: 24}} onPress={()=>{
-              this.setState({ showCredits: true });
+              this.setState({ showAboutUs: true });
             }}>
               <Icon type="Entypo" name="info-with-circle" style={{ fontSize: 20, color: 'white' }} />
             </TouchableHighlight>
@@ -201,10 +192,10 @@ class Home extends Component {
         </View>
 
         <AwesomeAlert
-            show={showCredits}
+            show={showAboutUs}
             showProgress={false}
-            title="Credits"
-            message={Credits}
+            title="About Us"
+            message={AboutUs}
             closeOnTouchOutside={false}
             closeOnHardwareBackPress={false}
             showConfirmButton={true}
@@ -216,10 +207,10 @@ class Home extends Component {
           />
           <AwesomeAlert
             styles={{zIndex: 10000, backgroundColor: 'red'}}
-            show={showAboutUs}
+            show={showAboutDev}
             showProgress={false}
             title="About Developer"
-            message={AboutUS}
+            message={AboutDev}
             closeOnTouchOutside={true}
             closeOnHardwareBackPress={true}
             showConfirmButton={true}
