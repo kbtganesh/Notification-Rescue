@@ -68,7 +68,7 @@ public class MainApplication extends Application implements ReactApplication {
 //
 //    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 //    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60, pendingIntent);
-    Log.d("KBT","MainApplication Oncreate");
+    Log.d("KBTCHECK","MainApplication Oncreate");
 //    Intent notificationIntent = new Intent(getApplicationContext(), NotificationListener.class);
 //    startService(notificationIntent);
   }

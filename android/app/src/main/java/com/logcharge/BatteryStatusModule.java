@@ -62,9 +62,9 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
         String flat = Settings.Secure.getString(getReactApplicationContext().getContentResolver(), "enabled_notification_listeners");
         boolean enabled = flat != null && flat.contains(cn.flattenToString());
         if(enabled){
-            Log.d("KBT", "NOTI ENABLE");
+            Log.d("KBTCHECK", "Notification ENABLED");
         }else{
-            Log.d("KBT", "NOTI NOT ENABLE");
+            Log.d("KBTCHECK", "Notification NOT ENABLE");
         }
         callback.invoke(enabled);
     }
@@ -77,7 +77,7 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void registerNotificationListener() {
-        Log.d("KBT", " registerNotificationListener Android registered listener");
+        Log.d("KBTCHECK", "Module - registerNotificationListener Android registered listener");
         LocalBroadcastManager.getInstance(mainContext).registerReceiver(myReceiver, new IntentFilter("NOTIFICATION_POSTED_KBT"));
     }
 
@@ -121,21 +121,24 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
 
     private class NLServiceReceiver extends BroadcastReceiver {
 
+
         @Override public void onReceive(Context context, Intent intent) {
+            Log.d("KBTCHECK", "NLServiceReceiver - onReceive");
+
             Bundle bundle = intent.getExtras();
 
             JSONObject json = new JSONObject();
             Set<String> keys = bundle.keySet();
             for (String key : keys) {
                 try {
-                    Log.d("KBT", "KEY-"+key);
-                    Log.d("KBT", "BUNDLE-"+bundle.get(key));
-                    Log.d("KBT", "JSON_WRAP-"+JSONObject.wrap(bundle.get(key)));
+//                    Log.d("KBT", "KEY-"+key);
+//                    Log.d("KBT", "BUNDLE-"+bundle.get(key));
+//                    Log.d("KBT", "JSON_WRAP-"+JSONObject.wrap(bundle.get(key)));
                     if(JSONObject.wrap(bundle.get(key)) != null){
-                        Log.d("TBKTBK", "Wrap done");
+//                        Log.d("TBKTBK", "Wrap done");
                         json.put(key, JSONObject.wrap(bundle.get(key)));
                     }else{
-                        Log.d("TBKTBK", "Wrap not done"+bundle.get(key));
+//                        Log.d("TBKTBK", "Wrap not done"+bundle.get(key));
                         json.put(key, bundle.get(key));
                     }
                     // json.put(key, bundle.get(key)); see edit below
@@ -143,7 +146,7 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
                     //Handle exception here
                 }
             }
-            Log.d("KBT", "keys" + keys.toString());
+            Log.d("KBTCHECK", "NLServiceReceiver - onReceive - json.length - " + json.length());
             WritableMap params = Arguments.createMap();
             params.putString("rawNotificationData", json.toString());
             getReactApplicationContext()
@@ -154,12 +157,12 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getIcon(String packageNamesListJSON, Callback iconCallback) {
-        Log.d("KBTTBK", "FUNC CALLED");
+        Log.d("KBTCHECK", "FUNC CALLED");
         try
         {
             JSONArray packageNamesList = new JSONArray(packageNamesListJSON);
             JSONObject json = new JSONObject();
-            Log.d("KBTTBK",packageNamesList.getString(0));
+            Log.d("KBTCHECK",packageNamesList.getString(0));
             for(int i = 0; i < packageNamesList.length(); i++){
                 try {
                     Drawable icon = getReactApplicationContext().getPackageManager().getApplicationIcon(packageNamesList.getString(i));
@@ -170,8 +173,8 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
                     String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
                     json.put(packageNamesList.getString(i), encoded);
                 } catch (PackageManager.NameNotFoundException e) {
-                    Log.d("KBTTBK", "ERROR");
-                    Log.d("KBTTBK", e.getMessage());
+                    Log.d("KBTCHECK", "ERROR");
+                    Log.d("KBTCHECK", e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -183,8 +186,8 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
             WritableMap params = Arguments.createMap();
             params.putString("icons", "");
             iconCallback.invoke(params);
-            Log.d("KBTTBK", "ERROR");
-            Log.d("KBTTBK", e.getMessage());
+            Log.d("KBTCHECK", "ERROR");
+            Log.d("KBTCHECK", e.getMessage());
             e.printStackTrace();
         }
     }

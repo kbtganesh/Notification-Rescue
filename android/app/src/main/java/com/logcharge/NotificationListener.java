@@ -1,6 +1,7 @@
 package com.logcharge;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -27,7 +28,7 @@ public class NotificationListener extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("KBT", "FROM LISTENER CLASS");
+        Log.d("KBTCHECK", "NotificationListener - onCreate");
         context = getApplicationContext();
     }
 //
@@ -41,12 +42,25 @@ public class NotificationListener extends NotificationListenerService {
 //    public void onDestroy() {
 //        super.onDestroy();
 //    }
-
+    @Override
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        Log.d("KBTCHECK", "NotificationListener - onListenerConnected");
+//        Log.d(TAG, "Service Reader Connected");
+//        Notification not = createNotification();
+//        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        if (mNotificationManager != null) {
+//            mNotificationManager.notify(NOTIFICATION_ID, not);
+//        }
+//
+//        startForeground(NOTIFICATION_ID, not);
+    }
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
 
-        Log.d("KBT", "FROM LISTENER onNotificationPosted");
+        Log.d("KBTCHECK", "NotificationListener - onNotificationPosted");
         if(!sbn.isOngoing()){
+            Log.d("KBTCHECK", "NotificationListener - onNotificationPosted - Not Ongoing Notification");
             String packageName = sbn.getPackageName();
             String key = sbn.getKey();
             PackageManager packageManager= getApplicationContext().getPackageManager();
@@ -75,7 +89,7 @@ public class NotificationListener extends NotificationListenerService {
 //        Log.d("KBT", "pack" +pack);
 //        Log.d("KBT",ticker);
 //        Log.d("KBT",title);
-            Log.d("KBT","Lets see bundle: STARTKBT : " + extras.toString() + ": ENDKBT");
+            Log.d("KBTCHECK", "NotificationListener - onNotificationPosted - AppName" + appName);
 
 
             Intent msgrcv = new Intent("NOTIFICATION_POSTED_KBT");
@@ -87,8 +101,7 @@ public class NotificationListener extends NotificationListenerService {
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
-        Log.i(TAG, "********** onNOtificationRemoved");
-        Log.i(TAG, "ID :" + sbn.getId() + "t" + sbn.getNotification().tickerText + "t" + sbn.getPackageName());
+        Log.d("KBTCHECK", "NotificationListener - onNotificationRemoved - NotiID" + sbn.getId());
     }
 
 }
