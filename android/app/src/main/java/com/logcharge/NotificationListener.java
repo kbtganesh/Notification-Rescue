@@ -99,6 +99,13 @@ public class NotificationListener extends NotificationListenerService {
         }
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        sendBroadcast(new Intent("YouWillNeverKillMe"));
+    }
+
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         Log.d("KBTCHECK", "NotificationListener - onNotificationRemoved - NotiID" + sbn.getId());

@@ -43,10 +43,12 @@ class Home extends Component {
       notificationsList: null,
       showAlert: false,
       rotateValue: new Animated.Value(0),
+      isServiceRunning: false,
     };
     this.callback = this.callback.bind(this);
     this.showAlert = this.showAlert.bind(this);
     this.hideAlert = this.hideAlert.bind(this);
+    this.isServiceRunningCallback = this.isServiceRunningCallback.bind(this);
     this.onNotificationPosted = this.onNotificationPosted.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
 
@@ -56,22 +58,36 @@ class Home extends Component {
     NativeModules.BatteryStatus.isNotificationEnabled(this.callback);
     NativeModules.BatteryStatus.registerNotificationListener();
     DeviceEventEmitter.addListener('onNotificationPosted', this.onNotificationPosted);
-
-
+    NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
+    
     
     // try {
-    //   const dateObject = await DatePickerAndroid.open({
-    //     // Use `new Date()` for current date.
-    //     // May 25 2020. Month 0 is January.
-    //     date: new Date(2020, 4, 25)
-    //   });
-    //   if (dateObject.action !== DatePickerAndroid.dismissedAction) {
-    //     console.log('dateObject: ', dateObject);
-    //     // Selected year, month (0-11), day
-    //   }
-    // } catch ({code, message}) {
-    //   console.warn('Cannot open date picker', message);
-    // }
+      //   const dateObject = await DatePickerAndroid.open({
+        //     // Use `new Date()` for current date.
+        //     // May 25 2020. Month 0 is January.
+        //     date: new Date(2020, 4, 25)
+        //   });
+        //   if (dateObject.action !== DatePickerAndroid.dismissedAction) {
+          //     console.log('dateObject: ', dateObject);
+          //     // Selected year, month (0-11), day
+          //   }
+          // } catch ({code, message}) {
+            //   console.warn('Cannot open date picker', message);
+            // }
+          }
+          
+  isServiceRunningCallback(serviceObj) {
+    if('services' in serviceObj) {
+      if(serviceObj.services.includes('com.logcharge.NotificationListener')) {
+        this.setState({isServiceRunning: true});
+      }else{
+        this.setState({isServiceRunning: false});
+        NativeModules.BatteryStatus.startNotificationService();
+      }
+    }else{
+      this.setState({isServiceRunning: false});
+      NativeModules.BatteryStatus.startNotificationService();
+    }
   }
 
   onNotificationPosted(params) {
@@ -147,7 +163,7 @@ class Home extends Component {
   }
   
   render() {
-    const { showAlert, showAboutDev, showAboutUs, rotateValue } = this.state;
+    const { showAlert, showAboutDev, showAboutUs, rotateValue, isServiceRunning } = this.state;
     const spin = rotateValue.interpolate({
       inputRange: [-1, 1],
       outputRange: ['-3deg', '3deg']
@@ -160,8 +176,13 @@ class Home extends Component {
           <Image style={{ ...styles.headerBG }} resizeMode={'cover'} source={require('./Images/pattern.png')}>
           </Image>
           <View style={styles.headerTop}>
+          <TouchableHighlight onPress={()=>{
+              NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
+            }}>
             <Icon type="FontAwesome" name="bell" style={{ fontSize: 32, color: 'white' }} />
+          </TouchableHighlight>
             <Text style={styles.headerText}>Rescue Notifications</Text>
+            <Text>{isServiceRunning?'service active': 'service inactive'}</Text>
           </View>
           <View style={styles.headerBottom}>
             <TouchableHighlight onPress={()=>{

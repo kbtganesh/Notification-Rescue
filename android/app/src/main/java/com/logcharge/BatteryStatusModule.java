@@ -1,5 +1,6 @@
 package com.logcharge;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -54,6 +55,34 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
     @Override
     public String getName() {
         return "BatteryStatus";
+    }
+
+    @ReactMethod
+    public void startNotificationService() {
+        Toast.makeText(getReactApplicationContext(), "Starting service..", Toast.LENGTH_LONG).show();
+        mainContext.startService(new Intent(mainContext.getApplicationContext(), NotificationListener.class));
+    }
+
+    @ReactMethod
+    public void isMyServiceRunning(Callback callback) throws JSONException {
+        Toast.makeText(getReactApplicationContext(), "Checking service..", Toast.LENGTH_LONG).show();
+        Log.i("KBTCHECK","KBTService: ");
+        Context context = getReactApplicationContext();
+        ActivityManager manager = (ActivityManager)context. getSystemService(Context.ACTIVITY_SERVICE);
+        JSONObject json = new JSONObject();
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i("KBTCHECK","Service: "+ service.service.getClassName());
+                json.put(service.service.getClassName(), service.service.getClassName());
+//                return true;
+//            }
+        }
+        WritableMap params = Arguments.createMap();
+        params.putString("services", json.toString());
+        callback.invoke(params);
+
+//        Log.i("Service not","running");
+//        return false;
     }
 
     @ReactMethod
