@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.service.notification.NotificationListenerService;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -58,22 +60,35 @@ public class BatteryStatusModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startNotificationService() {
-        Toast.makeText(getReactApplicationContext(), "Starting service..", Toast.LENGTH_LONG).show();
-        mainContext.startService(new Intent(mainContext.getApplicationContext(), NotificationListener.class));
+    public void startNotificationService(Promise promise) {
+        try {
+            Toast.makeText(getReactApplicationContext(), "Starting service..", Toast.LENGTH_LONG).show();
+            Log.i("KBTCHECK", "KBTService: startNotificationService");
+            Intent intent = new Intent(NotificationListener.NOTIFICATION_FOREGROUND_KBT);
+            intent.setClass(this.getReactApplicationContext(), NotificationListener.class);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                mainContext.startForegroundService(intent);
+//            } else {
+                mainContext.startService(intent);
+//            }
+        } catch (Exception e) {
+            promise.reject(e);
+            return;
+        }
+        promise.resolve(true);
     }
 
     @ReactMethod
     public void isMyServiceRunning(Callback callback) throws JSONException {
         Toast.makeText(getReactApplicationContext(), "Checking service..", Toast.LENGTH_LONG).show();
-        Log.i("KBTCHECK","KBTService: ");
+        Log.i("KBTCHECK","KBTService: isMyServiceRunning");
         Context context = getReactApplicationContext();
         ActivityManager manager = (ActivityManager)context. getSystemService(Context.ACTIVITY_SERVICE);
         JSONObject json = new JSONObject();
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 //            if (serviceClass.getName().equals(service.service.getClassName())) {
                 Log.i("KBTCHECK","Service: "+ service.service.getClassName());
-                json.put(service.service.getClassName(), service.service.getClassName());
+                json.put(service.service.getClassName(), service.foreground ? "Foreground" : "Background");
 //                return true;
 //            }
         }

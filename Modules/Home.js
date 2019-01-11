@@ -20,7 +20,14 @@ I am a solo Developer and I do not own a company. I've tried to do my best in th
 You can contact me at kbtganesh@gmail.com.
 `
 
-const AboutUs = `Icons used in this application are taken from FontAwesome, Entypo, MaterialIcons
+const AboutUs = `An excellent & beautiful way of presenting your notifications. Your notification, your comfort. You can be able to categorize it by application wise, date wise etc. 
+
+Don't forget to checkout separate section for WhatsApp users where you can check their messages received (including deleted messages) without even opening official WhatsApp application. Hence you can read messages without read receipts (without blue ticks) and also you can able to view deleted messages. 
+
+You can do all of these without Internet data connectivity. Every operation is done locally and your data will be safe on your mobile phone. 
+
+- Credits -
+Icons used in this application are taken from FontAwesome, Entypo, MaterialIcons
 Pattern Image used in this application is taken from flaticon
 `
 const BOX_TITLE = { 'ALL': 'All Notifications', 'APP': 'App wise Notifications', 'WHATSAPP': 'Whatsapp Messages', 'OTHER': 'Support', 'CONTACT': 'Contact' }
@@ -58,7 +65,8 @@ class Home extends Component {
     NativeModules.BatteryStatus.isNotificationEnabled(this.callback);
     NativeModules.BatteryStatus.registerNotificationListener();
     DeviceEventEmitter.addListener('onNotificationPosted', this.onNotificationPosted);
-    NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
+    this.startService();
+    // NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
     
     
     // try {
@@ -74,20 +82,30 @@ class Home extends Component {
           // } catch ({code, message}) {
             //   console.warn('Cannot open date picker', message);
             // }
-          }
+    }
           
   isServiceRunningCallback(serviceObj) {
+    console.log('serviceObj: ', serviceObj);
     if('services' in serviceObj) {
       if(serviceObj.services.includes('com.logcharge.NotificationListener')) {
         this.setState({isServiceRunning: true});
       }else{
         this.setState({isServiceRunning: false});
-        NativeModules.BatteryStatus.startNotificationService();
       }
     }else{
       this.setState({isServiceRunning: false});
-      NativeModules.BatteryStatus.startNotificationService();
     }
+  }
+
+  startService = () => {
+    NativeModules.BatteryStatus.startNotificationService()
+          .then(isSuccess => {
+            NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
+          })
+          .catch(e => {
+            this.setState({isServiceRunning: false});
+            console.log(e);
+          });
   }
 
   onNotificationPosted(params) {
@@ -177,12 +195,12 @@ class Home extends Component {
           </Image>
           <View style={styles.headerTop}>
           <TouchableHighlight onPress={()=>{
-              NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
+              this.startService();
             }}>
             <Icon type="FontAwesome" name="bell" style={{ fontSize: 32, color: 'white' }} />
           </TouchableHighlight>
             <Text style={styles.headerText}>Rescue Notifications</Text>
-            <Text>{isServiceRunning?'service active': 'service inactive'}</Text>
+            {/* <Text>{isServiceRunning?'service active': 'service inactive'}</Text> */}
           </View>
           <View style={styles.headerBottom}>
             <TouchableHighlight onPress={()=>{
@@ -196,6 +214,7 @@ class Home extends Component {
               <Icon type="Entypo" name="info-with-circle" style={{ fontSize: 20, color: 'white' }} />
             </TouchableHighlight>
             <TouchableHighlight style={{marginLeft: 24}} onPress={()=>{
+              // NativeModules.BatteryStatus.isMyServiceRunning(this.isServiceRunningCallback);
               this.sendEmail();
             }}>
               <Icon type="MaterialIcons" name="email" style={{ fontSize: 20, color: 'white' }} />
@@ -318,7 +337,9 @@ class Box extends Component {
               adSize="fullBanner"
               adUnitID="ca-app-pub-4058004042775880/8130239563"
               // testDevices={[AdMobBanner.simulatorId]}
-              onAdFailedToLoad={error => console.warn(error)}
+              onAdFailedToLoad={error => {
+                console.warn(error);
+              }}
             />}
         </TouchableHighlight>
       </KBTView>

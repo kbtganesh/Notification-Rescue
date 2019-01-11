@@ -1,19 +1,25 @@
 package com.logcharge;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
@@ -24,6 +30,8 @@ public class NotificationListener extends NotificationListenerService {
     Context context;
 
     private String TAG = this.getClass().getSimpleName();
+    public static final String NOTIFICATION_FOREGROUND_KBT = "NOTIFICATION_FOREGROUND_KBT";
+    private static int foreground_notification_id = 1;
 
     @Override
     public void onCreate() {
@@ -42,6 +50,28 @@ public class NotificationListener extends NotificationListenerService {
 //    public void onDestroy() {
 //        super.onDestroy();
 //    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("KBTCHECK", "NotificationListener - onStartCommand");
+
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            NotificationChannel chan1 = new NotificationChannel(
+//                    "notification_channel_id",
+//                    "default",
+//                    NotificationManager.IMPORTANCE_HIGH);
+//
+//            chan1.setLightColor(Color.TRANSPARENT);
+//            chan1.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+//
+//            notificationManager.createNotificationChannel(chan1);
+//        }
+//        startForeground(foreground_notification_id, getCompatNotification());
+        return START_STICKY;
+    }
+
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
@@ -109,6 +139,22 @@ public class NotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         Log.d("KBTCHECK", "NotificationListener - onNotificationRemoved - NotiID" + sbn.getId());
+    }
+
+    private Notification getCompatNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "notification_channel_id");
+        String str = "is capturing your notifications";
+        builder
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                .setContentTitle("Rescue Notification")
+                .setContentText(str)
+                .setTicker(str)
+                .setWhen(System.currentTimeMillis());
+        Intent startIntent = new Intent(getApplicationContext(), MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 1000, startIntent, 0);
+        builder.setContentIntent(contentIntent);
+        return builder.build();
     }
 
 }
